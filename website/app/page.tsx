@@ -13,7 +13,7 @@ export default async function HomePage() {
   let topEntries: any[] = []
   try {
     const leaderboard = await getLeaderboard()
-    topEntries = leaderboard?.entries?.slice(0, 3) ?? []
+    topEntries = (leaderboard?.entries as any[])?.slice(0, 3) ?? []
   } catch {
     topEntries = []
   }
