@@ -3,6 +3,7 @@
 ![Python](https://img.shields.io/badge/Python-Backend-blue)
 ![Avalanche](https://img.shields.io/badge/Avalanche-C--Chain-red)
 ![LLM](https://img.shields.io/badge/Claude-Haiku-purple)
+![Next.js](https://img.shields.io/badge/Next.js-15-black)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 **Onchain behavioral attestation protocol for Arena social accounts.**
@@ -10,6 +11,8 @@
 Tessera scores your posting behavior over a 30-day epoch — originality, focus, consistency, and depth — then seals the result permanently on the Avalanche blockchain. No edits. No deletions. A tamper-proof record of behavioral activity on Arena, sealed onchain.
 
 > Tag `@bannerusmaximus claim` on Arena to activate your record.
+
+🌐 **Live:** [tessera-8x7.pages.dev](https://tessera-8x7.pages.dev)
 
 ---
 
@@ -57,6 +60,10 @@ Instead of reputation based on popularity, Tessera measures behavioral signals �
                 │
                 ▼
          Verifiable Epoch Record
+                │
+                ▼
+      Public Profile Website
+   (tessera-8x7.pages.dev/@handle)
 ```
 
 ---
@@ -86,8 +93,9 @@ Tessera measures behavioral signals rather than social metrics such as followers
 | Smart contract | Solidity — `TesseraAnchor.sol` |
 | Database | PostgreSQL via Supabase |
 | API | FastAPI |
-| Hosting | Railway (backend) |
-| Frontend | Planned (profile explorer for sealed epochs) |
+| Backend hosting | Render — `tessera-vamv.onrender.com` |
+| Frontend | Next.js 15 + Tailwind CSS |
+| Frontend hosting | Cloudflare Pages — `tessera-8x7.pages.dev` |
 
 ---
 
@@ -108,6 +116,8 @@ The system intentionally separates three layers:
 - **attestation** — immutable onchain record
 
 This separation ensures the scoring methodology can be audited independently of the data collection layer.
+
+The website runs as a Next.js 15 app on Cloudflare Pages using edge runtime. All pages use `export const runtime = 'edge'` and fetch data server-side from the Render backend at request time. The `cache` option is omitted from all fetch calls as Cloudflare's edge runtime does not support the `RequestInitializerDict` cache field.
 
 ---
 
@@ -219,6 +229,11 @@ Interact with Tessera directly on Arena.
 @bannerusmaximus inspect @handle
 ```
 
+**4. View your profile online**
+```
+https://tessera-8x7.pages.dev/@handle
+```
+
 Scores are computed immediately. Epochs are sealed automatically onchain at the epoch boundary.
 
 ---
@@ -260,7 +275,7 @@ Attestation (attestation/)
 Poster (bot/poster.py)
     │  formats and posts reply as @bannerusmaximus
     ▼
-User sees scores on Arena
+User sees scores on Arena + tessera-8x7.pages.dev
 ```
 
 ---
@@ -328,7 +343,19 @@ Tessera/
 ├── scoring/
 │   └── engine.py         # Deterministic scoring engine
 ├── api/
-│   └── app.py            # FastAPI internal API
+│   └── app.py            # FastAPI backend (deployed on Render)
+├── website/              # Next.js 15 frontend (deployed on Cloudflare Pages)
+│   ├── app/
+│   │   ├── page.tsx               # Homepage + leaderboard preview
+│   │   ├── [handle]/page.tsx      # Profile page
+│   │   ├── leaderboard/page.tsx   # Full leaderboard
+│   │   └── audit/[epochId]/page.tsx # Audit trail
+│   ├── components/
+│   │   ├── HandleSearchInput.tsx  # Handle search (default export)
+│   │   └── ScoreGrid.tsx          # Score bar visualisation
+│   ├── lib/
+│   │   └── api.ts                 # Edge-compatible API client
+│   └── wrangler.toml              # Cloudflare Pages config + [vars]
 ├── .env.example          # Required environment variables
 └── README.md
 ```
@@ -365,6 +392,33 @@ Once written, attestations are immutable. The contract contains no administrativ
 
 ---
 
+## Deployment
+
+### Backend (Render)
+- URL: `https://tessera-vamv.onrender.com`
+- Start command: `uvicorn api.app:app --host 0.0.0.0 --port $PORT`
+- Free tier — spins down after inactivity, cold start ~30s
+- All environment variables set via Render dashboard
+
+### Frontend (Cloudflare Pages)
+- URL: `https://tessera-8x7.pages.dev`
+- Build command: `npm install --legacy-peer-deps && npx @cloudflare/next-on-pages`
+- Output directory: `.vercel/output/static`
+- Framework preset: Next.js (edge runtime)
+- Environment variable `NEXT_PUBLIC_API_URL` must be set as a **plaintext** variable in `wrangler.toml` under `[vars]` — not as an encrypted secret, as secrets are redacted at build time and `NEXT_PUBLIC_` variables must be baked into the bundle
+- All pages use `export const runtime = 'edge'`
+- All fetch calls omit the `cache` option — Cloudflare's edge runtime does not support the `RequestInitializerDict` cache field and will throw at runtime if it is present
+- `package-lock.json` is excluded from the repo — Cloudflare runs `npm ci` when a lock file is present, which requires perfect sync. Without it, Cloudflare falls back to `npm install`
+- The `build` script in `package.json` runs `next build` (not `next-on-pages`) to avoid a recursive invocation loop when `next-on-pages` internally calls `vercel build` which calls `npm run build`
+
+### Before Mainnet Production
+- Deploy `TesseraAnchor.sol` to Avalanche C-Chain mainnet via Remix
+- Update `CONTRACT_ADDRESS` in `.env` with mainnet address
+- Restore `MIN_POST_THRESHOLD` to 20 and handler gates to `20 total / 5 active`
+- Update CORS in `api/app.py` to include final production domain
+
+---
+
 ## User Journey
 
 1. User discovers Tessera on Arena or via `@bannerusmaximus`
@@ -378,7 +432,8 @@ Once written, attestations are immutable. The contract contains no administrativ
 9. Bot posts the full score breakdown to Arena (unsealed)
 10. At epoch boundary (Sunday midnight UTC), cron job seals the snapshot onchain
 11. TX hash is stored in Supabase and can be verified on Snowtrace
-12. User can inspect any other registered user with `@bannerusmaximus inspect @handle`
+12. Profile is visible at `tessera-8x7.pages.dev/@handle`
+13. User can inspect any other registered user with `@bannerusmaximus inspect @handle`
 
 ---
 
@@ -398,10 +453,11 @@ Once written, attestations are immutable. The contract contains no administrativ
 - Acknowledgment posts before long operations
 - Low sample size warnings
 - `.env.example` and clean repo structure
+- Public profile website with leaderboard and audit trail ✅
 
 ### Could Have 🔜
-- Public profile website (`tessera.xyz/@handle`)
-- Epoch history and leaderboard
+- Custom domain (`tessera.xyz`)
+- Avalanche C-Chain mainnet deployment
 - X (Twitter) integration
 - Signal integrity pillar — rug detector (tracks CA call accuracy)
 
@@ -428,6 +484,14 @@ CONTRACT_ADDRESS     # Deployed TesseraAnchor address
 RPC_URL              # Avalanche RPC endpoint
 ```
 
+Frontend environment variables are set in `website/wrangler.toml` under `[vars]`:
+```toml
+[vars]
+NEXT_PUBLIC_API_URL = "https://tessera-vamv.onrender.com"
+```
+
+> **Note:** Do not set `NEXT_PUBLIC_API_URL` as an encrypted secret in the Cloudflare dashboard — when a `wrangler.toml` is present, Cloudflare only allows secrets to be managed via the dashboard, and secrets are redacted during the build step, which means `NEXT_PUBLIC_` variables will be undefined at runtime.
+
 ---
 
 ## Running Locally
@@ -444,6 +508,11 @@ python -m bot.listener
 
 # Run the API server
 uvicorn api.app:app --reload
+
+# Run the website locally
+cd website
+npm install
+npm run dev
 ```
 
 ---
@@ -452,4 +521,6 @@ uvicorn api.app:app --reload
 
 The bot is live on Arena. Mention `@bannerusmaximus claim` on Arena to activate your record.
 
-Walkthrough video: [YouTube](...)
+Website: [tessera-8x7.pages.dev](https://tessera-8x7.pages.dev)
+
+Walkthrough video: [YouTube](https://youtu.be/cuJfCLkcGTQ)
