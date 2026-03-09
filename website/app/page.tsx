@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { HandleSearchInput } from '@/components/HandleSearchInput'
+import HandleSearchInput from '@/components/HandleSearchInput'
 import { getLeaderboard } from '@/lib/api'
 
 export const runtime = 'edge'
