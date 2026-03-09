@@ -31,6 +31,7 @@ from pydantic import BaseModel
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from database.client import (
+    get_client,
     get_user, upsert_user, update_user_last_epoch,
     get_epoch, get_latest_epoch, create_epoch,
     update_epoch_status, get_epoch_history,
@@ -413,6 +414,63 @@ async def _run_scoring(handle: str, epoch_start: str, epoch_end: str) -> dict:
     snapshot = score_epoch(collection, classifier.classify)
     return snapshot
 
+
+
+# ── GET /api/leaderboard ──────────────────────────────────────────────────────
+
+@app.get("/api/leaderboard")
+async def get_leaderboard(limit: int = 50):
+    """
+    Return top users ranked by composite score from their most recent sealed epoch.
+    Public endpoint — used by tessera.xyz leaderboard page.
+    """
+    try:
+        client = get_client()
+        # Get sealed epochs with scores, newest first per handle
+        res = (
+            client.table("epochs")
+            .select("handle, epoch_start, epoch_end, status, scores(*)")
+            .in_("status", ["sealed", "computed"])
+            .order("epoch_start", desc=True)
+            .limit(limit * 3)  # fetch extra to deduplicate handles
+            .execute()
+        )
+        epochs = res.data or []
+
+        # Keep only the most recent sealed epoch per handle
+        seen = {}
+        for epoch in epochs:
+            handle = epoch["handle"]
+            if handle not in seen:
+                seen[handle] = epoch
+
+        # Build leaderboard entries
+        leaderboard = []
+        for handle, epoch in seen.items():
+            scores_list = epoch.get("scores", [])
+            scores = scores_list[0] if isinstance(scores_list, list) and scores_list else {}
+            if not scores or scores.get("composite") is None:
+                continue
+            leaderboard.append({
+                "handle":      handle,
+                "composite":   scores.get("composite"),
+                "originality": scores.get("originality"),
+                "focus":       scores.get("focus"),
+                "consistency": scores.get("consistency"),
+                "depth":       scores.get("depth"),
+                "epoch_end":   epoch.get("epoch_end"),
+                "status":      epoch.get("status"),
+            })
+
+        # Sort by composite descending
+        leaderboard.sort(key=lambda x: x["composite"] or 0, reverse=True)
+        leaderboard = leaderboard[:limit]
+
+        return ok(leaderboard)
+
+    except Exception as e:
+        logger.error(f"Leaderboard failed: {e}", exc_info=True)
+        err("Failed to fetch leaderboard", status=500)
 
 # ── Health check ──────────────────────────────────────────────────────────────
 

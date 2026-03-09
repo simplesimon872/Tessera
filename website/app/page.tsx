@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import HandleSearchInput from '@/components/HandleSearchInput'
 
 export default function HomePage() {
   return (
@@ -123,8 +124,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Search / CTA */}
-      <section className="py-20">
+      {/* Search */}
+      <section className="py-20 border-b border-border">
         <div className="text-center">
           <p className="font-mono text-xs text-muted tracking-widest uppercase mb-4">
             Look up any handle
@@ -132,12 +133,12 @@ export default function HomePage() {
           <h2 className="font-sans font-extrabold text-3xl mb-8">
             Check a record
           </h2>
-          <HandleSearch />
+          <HandleSearchInput />
         </div>
       </section>
 
       {/* Key properties */}
-      <section className="pb-20 border-t border-border pt-20">
+      <section className="pb-20 pt-20">
         <p className="font-mono text-xs text-muted tracking-widest uppercase mb-12">
           Key properties
         </p>
@@ -170,19 +171,3 @@ export default function HomePage() {
     </div>
   )
 }
-
-// Client component for handle search
-function HandleSearch() {
-  return (
-    <form
-      action=""
-      onSubmit={undefined}
-      className="flex flex-col sm:flex-row gap-0 max-w-sm mx-auto"
-    >
-      <HandleSearchInput />
-    </form>
-  )
-}
-
-// Separate client component
-import HandleSearchInput from '@/components/HandleSearchInput'
