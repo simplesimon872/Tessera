@@ -4,11 +4,12 @@ import Link from 'next/link'
 export const runtime = 'edge'
 
 interface PageProps {
-  params: { epochId: string }
+  params: Promise<{ epochId: string }>
 }
 
 export default async function AuditPage({ params }: PageProps) {
-  const audit = await getAudit(params.epochId)
+  const { epochId } = await params
+  const audit = await getAudit(epochId)
 
   if (!audit) {
     return (
