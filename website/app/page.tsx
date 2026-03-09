@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import HandleSearchInput from '@/components/HandleSearchInput'
 
+export const runtime = 'edge'
+
 export default function HomePage() {
   return (
     <div className="max-w-5xl mx-auto px-6">

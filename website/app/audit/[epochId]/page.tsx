@@ -1,6 +1,8 @@
 import { getAudit, formatDate, formatScore } from '@/lib/api'
 import Link from 'next/link'
 
+export const runtime = 'edge'
+
 interface PageProps {
   params: { epochId: string }
 }

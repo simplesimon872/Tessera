@@ -2,6 +2,8 @@ import { getProfile, getAudit, formatDate, formatScore } from '@/lib/api'
 import { ScoreGrid } from '@/components/ScoreGrid'
 import Link from 'next/link'
 
+export const runtime = 'edge'
+
 interface PageProps {
   params: { handle: string }
 }

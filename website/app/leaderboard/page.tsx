@@ -1,6 +1,8 @@
 import { getLeaderboard, formatDate, formatScore } from '@/lib/api'
 import Link from 'next/link'
 
+export const runtime = 'edge'
+
 export const metadata = {
   title: 'Leaderboard — Tessera',
   description: 'Top behavioral scores across all registered Tessera accounts.',
