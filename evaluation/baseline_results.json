@@ -1,0 +1,56 @@
+{
+  "accuracy": 0.84,
+  "null_rate": 0.1,
+  "correct": 84,
+  "total": 100,
+  "category_distribution": {
+    "Market & Price": 18,
+    "Other": 24,
+    "Null": 10,
+    "Technology & Infrastructure": 21,
+    "AI & Agents": 13,
+    "DeFi & Protocols": 9,
+    "Governance & DAOs": 5
+  },
+  "confusion_matrix": {
+    "Market & Price": {
+      "Market & Price": 17,
+      "Other": 1,
+      "Null": 1
+    },
+    "Other": {
+      "Other": 16,
+      "Technology & Infrastructure": 1,
+      "Null": 1
+    },
+    "Technology & Infrastructure": {
+      "Technology & Infrastructure": 19,
+      "AI & Agents": 1,
+      "Other": 2
+    },
+    "DeFi & Protocols": {
+      "DeFi & Protocols": 9,
+      "AI & Agents": 1,
+      "Other": 1,
+      "Governance & DAOs": 1
+    },
+    "AI & Agents": {
+      "AI & Agents": 11,
+      "Other": 4
+    },
+    "Governance & DAOs": {
+      "Governance & DAOs": 4,
+      "Technology & Infrastructure": 1,
+      "Market & Price": 1
+    },
+    "Null": {
+      "Null": 8
+    }
+  },
+  "timestamp": "2026-03-02T02:50:23.311266+00:00",
+  "prompt_hash": "1deff518231c8bd90222942205f7ef9227c60463c2843c2d27defc21f6e5ce1f",
+  "prompt_version": "v5",
+  "model": "claude-haiku-4-5",
+  "temperature": 0,
+  "taxonomy_version": "v1.0"
+}

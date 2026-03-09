@@ -1,0 +1,584 @@
+# Tessera — 2-Week Prototype Build Plan (v5)
+
+> **Goal:** Working prototype demonstrating the full loop: opt-in → epoch analysis → score display → automatic onchain seal.
+> **Primary interaction:** @bannerusmaximus on Arena.
+> **Public record layer:** tessera.xyz — audit trails, protocol documentation.
+
+---
+
+## What "Working Prototype" Means
+
+By end of Week 2:
+- Tag @bannerusmaximus with a command on Arena and receive a real scored response
+- Scores computed from real post history across four pillars
+- Epoch snapshot sealed onchain automatically every week — no user action required
+- Public audit page at tessera.xyz verifiable by anyone
+
+Primary interaction is on Arena. Snowtrace and tessera.xyz are the receipt layer — not the product.
+
+Not required for prototype: B2B API, X integration, consult/record/ledger commands.
+
+---
+
+## Stack
+
+| Layer | Choice |
+|---|---|
+| Backend / Scoring Engine | Python |
+| LLM Feature Extraction | Claude API — `claude-haiku-4-5`, temperature=0 |
+| Onchain Seal | Avalanche C-Chain |
+| Bot Interface | @bannerusmaximus via Arena Agents API |
+| Website | Next.js + Tailwind (public record only) |
+| Database | Postgres (Supabase) |
+| Hosting | Vercel (website) + Railway or Render (backend + bot) |
+
+---
+
+## Locked Parameters
+
+| Parameter | Value | Notes |
+|---|---|---|
+| Minimum post threshold | 20 posts | Production value — do not reduce. Balances statistical stability vs accessibility. |
+| Minimum active post threshold | 5 active | After track routing. Gracefully rejects if fewer than 5 classify/greeting posts remain. |
+| Entropy category count | 6 active buckets | Collapse rare buckets into "Other" |
+| Sub-window entropy gate | 60 posts | Below this → frequency variance only |
+| Epoch window | 30 days | Updated from original 7-day spec. More accounts reach the 20-post threshold. Consistency pillar switches to thirds_entropy mode at 60+ posts. |
+| Anchor chain | Avalanche C-Chain | EVM-compatible, L1 path available later |
+| Domain | tessera.xyz | |
+| LLM temperature | 0 | Non-negotiable for score determinism |
+| Prompt version | v5 | Hash: `1deff518231c…` — frozen. Accuracy: 84%. |
+| Methodology version | v1.0 | |
+
+---
+
+## Bot Commands (v1 — 3 only)
+
+| Command | Who | Action |
+|---|---|---|
+| `@bannerusmaximus claim` | Self | Activate your Tessera — starts the weekly sealing cycle |
+| `@bannerusmaximus reveal` | Self | Returns current epoch scores — preview of what will be sealed |
+| `@bannerusmaximus inspect @handle` | Anyone | Returns any user's latest epoch — claimed or not |
+
+**Sealing is automatic. The user's only act is activation.**
+
+**`inspect` works on unclaimed accounts.**
+If the target has never claimed, return an unsealed preview with: *"@handle has no sealed record. This is what their epoch looks like."* That creates pressure — your record is visible whether you claim it or not.
+
+**Bot replies via new post tagging the user — never by replying to old threads.**
+
+---
+
+## Week 1 — Engine First
+
+> Nothing visual until the scoring engine works end-to-end in a terminal.
+
+---
+
+### Day 1 — Ingestion Layer ✅ COMPLETE
+
+**Completed:**
+- ✅ Tessera agent registered (`@tessera_agent`, ID: `3f97cc53-0021-4c88-a460-466242af9ea4`)
+- ✅ Ownership claimed by bannerusmaximus
+- ✅ Handle → userId resolution (with `id`/`userId` field fallback)
+- ✅ Epoch window post fetching with pagination and boundary detection
+- ✅ Pinned post filtering (`isPinned: true`)
+- ✅ Null content handling
+- ✅ Reply/quote detection
+- ✅ Minimum threshold enforcement
+- ✅ SHA-256 collection hash
+- ✅ Disk caching to `cache/posts/`
+- ✅ Rate limit tracker
+
+**Confirmed API field mappings:**
+- Date: `createdDate` (not `createdAt`)
+- Reply: `answerId` field
+- Quote: `repostId` field
+- Pinned: `isPinned: true` — skip, float regardless of date
+- User ID: `id` with fallback to `userId`
+
+---
+
+### Day 2 — LLM Feature Extraction + Evaluation Dataset ✅ COMPLETE
+
+**Completed:**
+- ✅ 100-post evaluation dataset built and frozen (`evaluation/dataset.json`)
+- ✅ Labelling rubric written before labelling began
+- ✅ Taxonomy locked: 6 buckets + Null
+- ✅ Prompt iterated to v5, frozen at hash `1deff518231c…`
+- ✅ Prompt stored in `evaluation/prompt_v5.txt`
+- ✅ Determinism confirmed: 10x runs, identical hashes on edge cases
+- ✅ Baseline accuracy: 84% across 100-post dataset
+- ✅ Drift detection in place — >5% classification change rejects prompt modifications
+- ✅ `baseline_results.json` stored
+
+**Locked taxonomy:**
+```python
+ALLOWED_CATEGORIES = [
+    "Market & Price",
+    "Technology & Infrastructure",
+    "DeFi & Protocols",
+    "AI & Agents",
+    "Governance & DAOs",
+    "Other",
+    "Null"
+]
+```
+
+---
+
+### Day 3 — Scoring Engine ✅ COMPLETE
+
+**Completed:**
+- ✅ `pre_classify()` track routing (classify / greeting / null)
+- ✅ Originality pillar
+- ✅ Focus pillar with Shannon entropy + Other dominance cap (>50% Other → cap at 60)
+- ✅ Consistency pillar — frequency_variance (20–59 posts) and thirds_entropy (60+)
+- ✅ Depth pillar — reply ratio, quote ratio, participation rate
+- ✅ Composite — equal 25% weights
+- ✅ Canonical snapshot hash — `sort_keys=True`, no whitespace, UTF-8, scores rounded to 2dp, timestamps ISO 8601
+- ✅ Methodology fields in snapshot: prompt_hash, model, methodology_version, collection_hash
+- ✅ 7/7 tests passing including live scoring
+- ✅ Live validated against 7 real accounts
+
+**Live validation results (30-day window, real LLM classifications):**
+
+| Handle | Composite | Originality | Focus | Consistency | Depth |
+|---|---|---|---|---|---|
+| @benbirtrolum | 53.35 | 100 | 100 | 13.4 | 0 |
+| @MykePayn3 | 50.0 | 100 | 100 | 0.0 | 0 |
+| @McVersePilot | 47.89 | 93.33 | 44.47 | 47.08 | 6.67 |
+| @rhynelf | 40.33 | 90 | 61.31 | 0.0 | 10 |
+| @simplesimon872 | 37.58 | 100 | 41.97 | 8.35 | 0 |
+| @choppersats | 35.66 | 100 | 42.62 | 0.0 | 0 |
+| @tfoacount | — | — | — | — | — | ← 2 active posts after routing, below threshold |
+| @lyagamii_ | — | — | — | — | — | ← 3 active posts after routing, below threshold |
+
+**Key observations from live testing:**
+- Consistency is the differentiating pillar — bursty posting patterns produce 0.0. This is correct behavior.
+- Heavy quote-only accounts (tfoacount: 90% quotes, lyagamii_: 90% quotes) produce very few classifiable posts — most route to null after track routing. This is a known v1.0 behavior; document in methodology.
+- All accounts in 30-day window had 19–20 posts total. Most had 50%+ null_track after routing. The 30-day window is the right call.
+
+**Files:**
+```
+scoring/
+  __init__.py
+  constants.py
+  engine.py
+test_scoring.py
+```
+
+---
+
+### Day 4 — Attestation Layer 🔜 NEXT
+
+**Sealing is automatic. The user's only act is claiming.**
+
+```
+Claim registered
+      ↓
+Weekly cron (Sunday midnight UTC)
+      ↓
+Pull → Score → Canonical Hash → Anchor Onchain
+      ↓
+Store TX hash, update status: sealed
+      ↓
+Post notification reply to user tagging them
+```
+
+**Architecture decisions (locked):**
+- Protocol wallet pays all gas — users never sign transactions in v1
+- Deploy contract once to Avalanche C-Chain mainnet — reuse across all epochs
+- One `anchor()` call per epoch per user — no batching for prototype
+- Contract emits event only — no storage, no access control, no upgrades
+
+**Smart contract — Solidity:**
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract TesseraAnchor {
+    event Anchored(address indexed sender, bytes32 indexed snapshotHash, uint256 timestamp);
+
+    function anchor(bytes32 snapshotHash) external {
+        emit Anchored(msg.sender, snapshotHash, block.timestamp);
+    }
+}
+```
+
+**Deploy script — Hardhat / ethers.js targeting Avalanche C-Chain:**
+- Network: Avalanche C-Chain mainnet (chainId 43114, RPC: https://api.avax.network/ext/bc/C/rpc)
+- Store deployed contract address in config — never hardcode inline
+- Verify on Snowtrace after deploy
+
+**Python sealer (`attestation/sealer.py`):**
+```python
+# anchor_epoch(snapshot: dict, private_key: str, contract_address: str) -> dict
+# Returns: { tx_hash, block_number, anchored_at }
+```
+- Load contract ABI from file (not hardcoded)
+- Connect via web3.py to Avalanche C-Chain
+- Build and sign transaction from protocol wallet
+- Submit and wait for receipt (1 confirmation sufficient for prototype)
+- Return tx_hash, block_number, anchored_at timestamp
+
+**Cron (`attestation/cron.py`):**
+- Runs weekly, Sunday midnight UTC
+- Fetches all accounts with `status=computed`
+- For each: fetch cached collection → score → seal → store tx_hash + block_number → update status to `sealed`
+- Post Arena notification to user: *"Epoch [start–end] sealed. TX: 0x... · tessera.xyz/handle"*
+- On failure: log, mark `status=seal_failed`, retry next run — never silently drop
+
+**Cron resilience:**
+- [ ] Store `last_seal_run` timestamp in a state file (pre-DB) or DB row
+- [ ] On startup: if `last_seal_run` > 7 days ago, execute immediately
+- [ ] Idempotent: before every `anchor()` call, check if epoch already has a tx_hash — skip if so
+- [ ] Alert/log if cron has not run within 25 hours
+
+**Day 4 checklist:**
+- [ ] `TesseraAnchor.sol` written and tested locally
+- [ ] Deploy script written (Hardhat)
+- [ ] Contract deployed to Avalanche C-Chain mainnet
+- [ ] Contract address stored in config
+- [ ] Snowtrace verification confirmed
+- [ ] `attestation/sealer.py` — `anchor_epoch()` implemented and tested against mainnet
+- [ ] `attestation/cron.py` — weekly job implemented
+- [ ] Idempotency test: run cron twice on same epoch → second run skips, no duplicate tx
+- [ ] Missed run test: set `last_seal_run` to 8 days ago, restart → cron executes immediately
+- [ ] End-to-end test: score a cached account → seal → confirm tx on Snowtrace → hash matches
+
+**Files to create:**
+```
+attestation/
+  __init__.py
+  sealer.py
+  cron.py
+  TesseraAnchor.sol
+  deploy.js          ← Hardhat deploy script
+  abi.json           ← contract ABI (generated post-compile)
+config/
+  chain.py           ← RPC URL, chain ID, contract address
+```
+
+**Output:** Given a scored snapshot, `anchor_epoch()` submits a tx to Avalanche, returns the receipt, and the cron runs it weekly for all claimed accounts.
+
+---
+
+### Day 5 — Data Layer + Internal API
+
+**Supabase schema:**
+
+```sql
+-- users: one row per claimed handle
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    handle TEXT UNIQUE NOT NULL,
+    arena_user_id TEXT NOT NULL,
+    claimed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_epoch_id UUID REFERENCES epochs(id)
+);
+
+-- epochs: one row per scoring window per handle
+CREATE TABLE epochs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    handle TEXT NOT NULL,
+    epoch_start TIMESTAMPTZ NOT NULL,
+    epoch_end TIMESTAMPTZ NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('computed', 'sealed', 'seal_failed')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- scores: pillar scores for each epoch
+CREATE TABLE scores (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    epoch_id UUID NOT NULL REFERENCES epochs(id),
+    originality NUMERIC(5,2),
+    focus NUMERIC(5,2),
+    consistency NUMERIC(5,2),
+    depth NUMERIC(5,2),
+    composite NUMERIC(5,2),
+    methodology TEXT NOT NULL DEFAULT 'v1.0',
+    snapshot_json JSONB,        -- full canonical snapshot stored here
+    collection_hash TEXT,
+    prompt_hash TEXT,
+    model TEXT
+);
+
+-- anchors: onchain seal receipts
+CREATE TABLE anchors (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    epoch_id UUID NOT NULL REFERENCES epochs(id),
+    tx_hash TEXT NOT NULL,
+    block_number BIGINT NOT NULL,
+    snapshot_hash TEXT NOT NULL,
+    anchored_at TIMESTAMPTZ NOT NULL
+);
+
+-- notifications: polling crash recovery
+CREATE TABLE bot_state (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+-- Usage: INSERT INTO bot_state (key, value) VALUES ('last_processed_notification_id', '...')
+--        ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
+
+-- command_log: rate limiting + abuse detection
+CREATE TABLE command_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    handle TEXT NOT NULL,
+    command TEXT NOT NULL,
+    issued_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX ON command_log (handle, issued_at);
+```
+
+**Internal API endpoints (FastAPI):**
+- `POST /api/score` — trigger scoring for a handle (uses cache if available)
+- `GET /api/score/:handle` — retrieve epoch history
+- `GET /api/audit/:epoch_id` — full audit trail including snapshot_json
+- `POST /api/cron/seal` — weekly cron trigger (called by scheduler, not user)
+- `POST /api/bot/command` — receive and route bot commands (Day 6)
+
+**Day 5 checklist:**
+- [ ] Supabase project created, schema applied
+- [ ] DB connection tested from Python
+- [ ] FastAPI app scaffolded
+- [ ] All 5 endpoints implemented
+- [ ] `POST /api/score` → scores a handle, stores epoch + scores rows
+- [ ] `GET /api/audit/:epoch_id` → returns full snapshot_json + anchor if sealed
+- [ ] End-to-end test: score a cached account → store → seal → audit retrieval → snapshot hash matches anchor hash
+
+---
+
+## Week 2 — Bot + Public Record Layer
+
+---
+
+### Day 6 — Bot Command Listener + Router
+
+**Polling loop — built for failure, not success**
+
+The polling loop will crash. Plan for it from the start.
+
+- [ ] Poll `GET /agents/notifications/unseen` every 60 seconds
+- [ ] Store `last_processed_notification_id` in `bot_state` table after each batch
+- [ ] On restart: load last processed ID, re-check unseen from that point
+- [ ] Idempotent command handlers — processing the same notification twice must produce the same result
+- [ ] Backoff: if 3 consecutive poll failures, wait 5 minutes before retrying
+- [ ] Alert/log if polling loop silent for > 5 minutes
+
+**Command parser:**
+- [ ] Filter for `mention` type notifications only
+- [ ] Strip `@bannerusmaximus`, extract first keyword, case-insensitive
+- [ ] Parse `inspect` target handle from remainder of post
+- [ ] Unknown commands → reply listing the 3 available commands
+- [ ] Rate limiting: max 5 commands per user per hour (check `command_log`)
+- [ ] Global cap: max 30 commands per minute across all users
+- [ ] Cache `inspect` results for 10 minutes — don't re-score on spam
+- [ ] Epoch cache: if epoch window hasn't changed, return stored snapshot — never recompute, never re-run LLM
+
+**Bot reply rule:** Always post a new thread tagging the user. Never reply to old threads.
+
+---
+
+### Day 7 — Command Handlers
+
+**`claim`**
+- [ ] If already activated: return current status and last epoch summary
+- [ ] If not: register in `users` table, confirm
+- [ ] Reply: *"Tessera activated, @handle. Your record will seal automatically every Sunday. Tag me with `reveal` to view your current epoch at any time."*
+
+**`reveal`**
+- [ ] Run scoring pipeline (or return cached result if same epoch window)
+- [ ] If not claimed: show scores, mark unsealed — *"Unsealed. Activate your Tessera to begin automatic weekly sealing."*
+- [ ] If claimed: show scores + epoch window + days until next auto-seal
+- [ ] Reply format:
+```
+@handle — Epoch [Feb 19–Mar 19]
+
+Composite:    74
+Consistency:  71
+Focus:        83
+Depth:        61
+Originality:  80
+
+Seals automatically in 3 days.
+tessera.xyz/handle
+```
+
+**`inspect @handle`**
+- [ ] Parse target handle
+- [ ] Run scoring on target (or return cached)
+- [ ] If target has sealed epochs: return latest sealed record with TX hash
+- [ ] If target has never activated: return unsealed preview + *"No sealed record. This is what @handle's epoch looks like unsealed."*
+- [ ] Cache result 10 minutes
+
+**Output:** All 3 commands returning real data from real accounts.
+
+---
+
+### Day 8 — tessera.xyz Public Record Layer
+
+One job: be the verifiable audit trail that bot replies link to.
+
+**`tessera.xyz/[handle]` — Public profile:**
+- [ ] Latest sealed epoch: composite + 4 pillars
+- [ ] Sealed epoch history list with TX links
+- [ ] Unsealed current epoch visible if exists (marked clearly)
+- [ ] "Epochs sealed: N" counter
+
+**`tessera.xyz/[handle]/epoch/[epoch_id]` — Audit view (non-negotiable):**
+- [ ] Epoch window dates
+- [ ] Total posts analyzed + post breakdown (classified / greeting / null)
+- [ ] Pillar scores + composite
+- [ ] Metric weights: 25% each
+- [ ] Methodology version: `v1.0`
+- [ ] Other dominance cap: display if applied (*"Other dominance cap applied: X% of posts → Other. Focus capped at 60."*)
+- [ ] Consistency mode displayed: `frequency_variance` or `thirds_entropy`
+- [ ] Depth v1.0 definition: *"Depth in v1.0 measures engagement behaviour: reply ratio, quote ratio, and participation rate. Nested reply depth traversal is not included in this methodology version."*
+- [ ] Onchain anchor: TX hash + block, linked to Snowtrace
+- [ ] Snapshot hash with reproduce-it instructions
+- [ ] Topic distribution (6 buckets + Null)
+- [ ] Prompt version + hash displayed
+
+**`tessera.xyz` — Protocol home:**
+- [ ] What Tessera is
+- [ ] How it works (three steps)
+- [ ] How to interact (tag @bannerusmaximus on Arena)
+- [ ] Methodology documentation link
+- [ ] Methodology disclaimer (see below)
+
+**Design rule:** A score is a number. Not a verdict, not a badge, not a tier. Report, not reward.
+
+---
+
+### Day 9 — Integration + Polish
+
+- [ ] Full command flow end-to-end: `claim` → `reveal` → auto-seal triggers → audit page
+- [ ] `inspect` on claimed and unclaimed accounts
+- [ ] Bot reply formatting consistent across all 3 commands
+- [ ] All tessera.xyz links resolve correctly from bot replies
+- [ ] Snowtrace links confirmed working
+- [ ] Canonical hash: reproduced manually from audit page data, confirmed matches onchain hash
+- [ ] Polling crash recovery: kill process mid-run, restart, confirm no duplicate actions
+- [ ] Cron recovery: simulate missed run, confirm executes on restart
+- [ ] Other dominance cap: confirm audit page displays warning when triggered
+- [ ] Quote-heavy accounts: confirm graceful rejection message when active post count < 5
+
+---
+
+### Day 10 — QA + Demo Prep
+
+**QA checklist:**
+- [ ] `claim` → already claimed → correct response
+- [ ] `reveal` → unclaimed account → unsealed preview with auto-seal prompt
+- [ ] `reveal` → claimed account → shows days until next auto-seal
+- [ ] `inspect` → unclaimed target → unsealed preview with pressure framing
+- [ ] Auto-seal cron: simulate Sunday trigger, confirm all claimed accounts sealed
+- [ ] Cron idempotency: run cron twice, confirm no double-anchor
+- [ ] < 20 posts total → clean rejection message
+- [ ] < 5 active posts after routing → clean rejection message
+- [ ] Unknown command → helpful response listing 3 commands
+- [ ] Rate limit hit → graceful message
+- [ ] Polling restart: confirm `last_processed_notification_id` loads correctly, no duplicates
+- [ ] LLM determinism: run same 10 posts twice, confirm identical classification and hash
+- [ ] Run frozen evaluation dataset — confirm no drift from Day 2 baseline (prompt_hash `1deff518231c…` unchanged)
+
+**Demo flow (Arena-native):**
+1. Tag `@bannerusmaximus claim` live — confirmation reply appears
+2. Tag `@bannerusmaximus reveal` — scores appear with auto-seal countdown
+3. Open tessera.xyz/handle — public profile loads
+4. Open audit page — walk through every number including post breakdown
+5. Tag `@bannerusmaximus inspect @handle` — show public shareable response for a second account
+6. Show a pre-sealed account's audit page — TX hash, Snowtrace link, reproducible hash
+
+**Pre-select demo accounts:**
+- @McVersePilot — highest composite (47.89), most balanced across all pillars — best demo of system working
+- @benbirtrolum — 100 originality + 100 focus, low consistency — good contrast story
+- @simplesimon872 — your own account, self-scored live
+
+---
+
+## What to Cut If You're Behind
+
+In this order only:
+
+1. **tessera.xyz full site** — single static audit page is enough
+2. **`reveal` command** — `claim` and `inspect` are the two that matter most for demo
+3. **Supabase** — JSON files on disk, proper DB after demo
+4. **Canonical hash verification on audit page** — show the hash, add reproduce-it instructions later
+
+**Never cut:**
+- `inspect` — the viral mechanic
+- The audit page — the answer to "why is this credibly neutral?"
+- The auto-seal cron — without it the protocol has no pulse
+- LLM determinism controls — without these, scores drift and the whole thing is untrustworthy
+
+---
+
+## Risk Register
+
+| Risk | Mitigation |
+|---|---|
+| LLM output drift between runs | temperature=0, prompt v5 frozen (hash `1deff518231c…`), determinism confirmed |
+| Entropy fragile at low post counts | 6-bucket taxonomy, 20-post minimum, documented v1.0 limitation |
+| Quote-heavy accounts with very few classifiable posts | 5 active post minimum after routing, clean rejection message |
+| Canonical hash mismatch | `sort_keys=True`, fixed separators, UTF-8, scores locked at 2dp, timestamps ISO 8601 |
+| Polling loop crashes silently | Store last processed ID in DB, backoff logic, silence alerting |
+| Cron misses a run | Store `last_seal_run`, execute immediately on restart if missed, alert if silent > 25 hours |
+| Double-seal on restart | Cron idempotent — checks tx_hash in anchors table before every onchain write |
+| `inspect` spam exhausting rate limits | Cache 10 minutes, global 30/min cap |
+| Depth pillar challenged | v1.0 definition explicitly documented in audit view |
+| Minimum threshold excludes users | 20 posts at 6 buckets is defensible — document tradeoff |
+| Gas costs on Avalanche | ~$0.01–0.02 per seal. 100 users/week = ~$1–2. Not a concern for prototype. |
+| Private key exposure | Never commit to repo — load from environment variable only |
+
+---
+
+## Methodology Disclaimer
+
+This must appear on the audit page, in the protocol documentation, and in the tessera.xyz about section:
+
+> Tessera does not evaluate truthfulness, moral alignment, or content quality. It evaluates structural behavioral properties only.
+
+This is not a caveat. It is the scope definition.
+
+---
+
+## Definition of Done
+
+1. `@bannerusmaximus claim` on Arena registers a handle and returns a confirmation reply
+2. `@bannerusmaximus reveal` returns real scores from real posts with auto-seal countdown
+3. `@bannerusmaximus inspect @handle` returns a public record — for claimed AND unclaimed accounts
+4. Weekly cron seals all claimed accounts onchain automatically — no user action required
+5. tessera.xyz/handle resolves to a public profile
+6. The audit page shows all inputs and the snapshot hash is independently reproducible
+7. Polling loop survives a restart without duplicate actions
+8. Cron survives a restart without double-sealing
+9. Same input always produces same output — LLM determinism confirmed
+
+---
+
+## Language Reference
+
+| Avoid | Use Instead |
+|---|---|
+| "Reputation computed." | "Behavioral epoch analyzed." |
+| "Your reputation score" | "Your epoch score" / "Your behavioral record" |
+| "Preview" | "Reveal" |
+| "Verify" | "Inspect" |
+| "Opt in to tracking" | "Activate your Tessera" |
+| "Users never leave the platform" | "Primary interaction is on Arena" |
+| "High reputation" | "High structural consistency" |
+| "Seal your record" (user instruction) | "Your record seals automatically every Sunday" |
+
+---
+
+*Tessera v0.1 — prototype target: end of Week 2.*
+*Methodology: v1.0*
+*Entropy buckets: 6 (max_entropy = log₂(6) ≈ 2.585)*
+*Depth definition: engagement behaviour only — reply ratio, quote ratio, participation rate.*
+*Sealing: automatic only. Weekly cron. Sunday midnight UTC.*
+*Epoch window: 30 days.*
+*Primary interaction: @bannerusmaximus on Arena.*
+*Public record: tessera.xyz*
+*Prompt: v5, hash `1deff518231c…`, accuracy 84%, frozen.*

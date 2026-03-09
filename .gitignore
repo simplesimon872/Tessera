@@ -1,0 +1,33 @@
+# Environment
+.env
+.env.local
+tessera_agent/
+
+# Cache
+cache/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Node (for frontend later)
+node_modules/
+.next/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# my stuff
+2 min video pitch/
+**/archive/

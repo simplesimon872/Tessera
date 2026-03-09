@@ -1,0 +1,389 @@
+# Tessera — Full Project Summary
+
+---
+
+## Core Concept
+
+You're building:
+
+**Tessera**
+
+A reputation primitive.
+
+Not a dashboard.
+Not an analytics tool.
+Not a scoring app.
+
+A foundational behavioral history layer that other platforms can build on.
+
+The key idea:
+
+> Reputation should be structured, verifiable, and portable — not inferred from vibes.
+
+---
+
+## Naming & Structure Decisions
+
+### Platform Architecture
+
+- **Tessera** = the protocol / primitive layer
+- **Bannerus Maximus** = the Arena interface (one front-end implementation)
+
+Important:
+Bannerus is not the product.
+Bannerus is one interface on top of Tessera.
+
+Just like:
+- X could have its own interface
+- Farcaster could have another
+- DAOs could integrate it directly
+- Hiring platforms, governance dashboards, etc.
+
+This separation matters philosophically and strategically.
+
+### Why "Tessera" Works
+
+A tessera in ancient Rome:
+- A small token
+- Used to establish identity
+- Granted hospitality or access
+- Portable proof of who you are
+
+It aligns perfectly with:
+- Opt-in claiming
+- Verifiable identity fragments
+- Epoch-based accumulation
+- Small, composable proof units
+
+The historical resonance is intentional and elegant — not gimmicky.
+
+The language scales naturally:
+- "Mint your Tessera."
+- "Anchor your Tessera."
+- "Epoch 12 Tessera recorded."
+- "DAO referenced 8 Tessera epochs."
+
+**Name locked.**
+
+---
+
+## The Core Thesis
+
+The problem is not:
+"People don't have reputation."
+
+The problem is:
+
+> Online behavior is visible but not structured. There is no infrastructure for compound, verifiable behavioral history.
+
+Right now:
+- Engagement ≠ credibility
+- Performance ≠ consistency
+- Metrics ≠ structure
+- Vibes ≠ verifiable record
+
+Tessera introduces:
+- Structured analysis
+- Epoch windows
+- Methodology versioning
+- Public audit trails
+- Onchain anchoring
+- Compounding history
+
+Reputation becomes: time-bound, transparent, inspectable, portable, and influenceable.
+
+---
+
+## Why Hasn't This Been Built?
+
+Previous attempts failed for two structural reasons:
+
+1. **Wallet-centric design** — most crypto reputation systems start from transaction history, not behavior. They measure capital movement, not consistency of thought. They tell you who interacted with Aave, not who consistently produces analysis.
+
+2. **Off-platform tools kill adoption** — social scoring tools that live outside the platform require users to connect wallets, navigate external dashboards, and share links externally. Friction kills adoption, especially for social users.
+
+Tessera embeds directly into the social layer and requires no new behavior from users. The timing advantage: AI extraction is now reliable enough to classify behavior at scale, structured social APIs are available, and onchain anchoring is cheap and fast enough to make reputation epochs viable.
+
+---
+
+## System Architecture (Three Layers)
+
+### Layer 1 — Ingestion
+Platform-specific data pull. Currently Arena via the Agents API. Designed to be swappable — X, Farcaster, or any platform with structured API access slots in without requiring changes to the scoring engine.
+
+### Layer 2 — Scoring Engine (Core IP)
+The protocol logic. Versioned, publicly documented, transparent methodology. This is what makes Tessera a primitive rather than a plugin. It sits above any single platform.
+
+### Layer 3 — Attestation
+Each epoch snapshot is hashed and anchored onchain. Immutable, timestamped, independently verifiable. The chain record includes the score, the hash of analyzed data, the methodology version, and the timestamp.
+
+---
+
+## How It Works
+
+### 1. Opt-In Claim
+User claims their behavioral history. Participation is deliberate — opting in is itself a signal that they stand behind their posting history.
+
+### 2. Epoch-Based Analysis
+Each epoch covers a defined time window. Recent posts are analyzed across four structured dimensions. Minimum post threshold required for analysis (exact number to be defined — recommendation: 25 minimum).
+
+### 3. Fixed Topic Taxonomy
+The LLM classifies each post into one primary topic (and optionally one secondary) from a fixed 10-category taxonomy:
+
+1. Market & Price
+2. Technology & Infrastructure
+3. DeFi & Protocols
+4. NFT & Digital Assets
+5. AI & Agents
+6. Memecoins & Culture
+7. Governance & DAOs
+8. Macro & Tradfi
+9. Market Meta
+10. Personal & Lifestyle
+
+Fixed taxonomy is what makes entropy calculations deterministic. The LLM classifies — it does not cluster freely. This was a critical architectural decision.
+
+### 4. Four Scoring Pillars
+
+**Consistency** — posting frequency regularity plus topic distribution stability over the analysis window. Measures whether someone shows up consistently and stays in their lane.
+
+**Domain Focus** — entropy of topic distribution. Low entropy = focused. High entropy = scattered. Derived from the fixed taxonomy classification.
+
+**Depth** — reply ratio, average reply depth, thread participation. Measures substantive engagement vs surface broadcasting. Primarily API-derived, not LLM-dependent.
+
+**Originality** — ratio of original posts to replies and quote-posts. Measured via API metadata. No LLM required.
+
+### 5. Score Computation
+
+Each pillar produces a 0–100 score. A composite score is computed as an equal-weighted average of all four pillars (25% each). Equal weighting chosen deliberately — avoids bias accusations, easy to explain, mathematically clean. Unequal weighting is V2.
+
+All scores are absolute (universal 0–100 scale), not contextual. Composability requires a universal reference point.
+
+Methodology versioned from day one (v1.0). Old scores remain comparable when methodology updates because they are tagged to the version used.
+
+### 6. Public Audit Trail
+
+Every score includes:
+- Epoch window dates
+- Total posts analyzed
+- Metric weighting
+- Methodology version
+- Hash of analyzed dataset
+- Algorithm version
+
+Full auditability is the differentiator. If someone asks "why did I score 74?" — show the extracted feature counts, the exact formula, and the math. Reproducible on demand.
+
+### 7. Onchain Anchor
+
+Epoch snapshot anchored onchain. Transaction confirmed. Hash visible. Permanent record. The score snapshot includes: extracted features, final scores, timestamp, methodology version, and hash.
+
+### 8. Compounding History
+
+Each epoch builds on the last. Not one score — a history of behavior. This is the moat. Once someone has 12 anchored epochs, switching becomes costly. Reputation compounds.
+
+---
+
+## Update Model
+
+- **Weekly epochs** — fixed schedule, not on-demand. Makes gaming expensive, creates natural narrative hook ("your reputation updates every week").
+- **On-demand preview** — users can run analysis and see scores locally at any time. Free and instant.
+- **Onchain write** — only happens at epoch close. Meaningful event, not a refresh.
+
+This distinction is a product feature: preview is exploratory, epoch anchoring is consequential.
+
+---
+
+## Gaming Defense
+
+No reputation system is fully ungameable. The honest answer is that gaming Tessera requires sustained behavioral change over the analysis window — and that's the defense.
+
+> "Gaming our system requires you to actually behave the way the system rewards — consistently, with focus, with depth. If someone games their way to a high score by posting disciplined, focused, substantive content for weeks, the system worked. The behavior became real."
+
+Structural defenses:
+- Weekly epochs prevent burst gaming
+- Audit view makes gamed scores detectable by anyone inspecting the underlying posts
+- Longitudinal tracking makes sudden score jumps themselves a signal (V2)
+
+Core principle: **we make gaming indistinguishable from genuine improvement.**
+
+---
+
+## LLM Usage Strategy
+
+The LLM extracts features only. It does not produce scores.
+
+Rules:
+- Analyze provided text only
+- No external knowledge
+- Strict JSON schema output
+- No inferred intent
+- Return null if unsure
+- Programmatic validation of all outputs — invalid schema triggers rejection and retry
+
+Example output:
+```json
+{
+  "speculative_phrases": 14,
+  "price_predictions": 3,
+  "hedge_words": 7,
+  "topic_primary": "Market & Price",
+  "topic_secondary": "Macro & Tradfi",
+  "avg_reply_depth": 2.4,
+  "narrative_shifts": 1
+}
+```
+
+**LLM = interpretation. Math = truth.**
+
+Engagement features (reply depth, thread participation, originality ratio) are pulled from the API directly — no LLM involved. This removes an entire category of hallucination risk and makes those features genuinely reliable.
+
+---
+
+## Business Model
+
+The scoring layer is the product. Access to it is the business.
+
+**Revenue Streams:**
+
+1. **Onchain Attestation Fees** — users pay to anchor weekly epochs and maintain active reputation tracking.
+
+2. **API / Query Access (B2B)** — DAOs pay to query contributor reputation, batch-evaluate applicants, and integrate reputation into governance dashboards.
+
+3. **Platform Integration Licensing** — Arena or other platforms pay for native reputation scoring integration, dynamic profile layers, and governance filters.
+
+The correct framing: we monetize access to verifiable reputation data. Not "query fees" — that sounds thin. Infrastructure-grade access to a reputation layer.
+
+**The moat:** historical continuity. Once DAOs rely on epoch history, contributors build track records over months, and integrations reference hash attestations — switching becomes expensive. Reputation compounds. The network of opted-in high-signal users is the surface moat. The temporal depth of anchored history is the real moat.
+
+---
+
+## Credible Neutrality (Why Onchain)
+
+If a judge asks "why does this need to be onchain?" —
+
+> "Because reputation only works if it's credibly neutral. If the score lives in our database, users have to trust us. If it's anchored onchain, the snapshot is immutable, timestamped, and independently verifiable. We can't quietly adjust someone's reputation — and neither can they. That neutrality is what makes it infrastructure rather than a feature."
+
+Extended version:
+
+> "Onchain anchoring turns reputation from an opinion into a reference point. Other protocols can build on it. DAOs can query it. Applications can integrate it. It becomes composable."
+
+**Credible neutrality is the philosophical foundation.**
+
+---
+
+## Participation Model
+
+**Opt-in for V1. Intentionally, not apologetically.**
+
+> "Reputation isn't something assigned to you. It's something you choose to anchor."
+
+Why opt-in is strategically stronger:
+- Aligns with credible neutrality — users claim, not receive
+- Early adopters are high-signal users proud of their track record
+- Removes social blowback surface during build
+- Does not block public-by-default or permissioned querying in V2
+
+B2B pathway (V2): organizations can request permissioned scoring of public accounts for contributor evaluation. Opt-in for individuals, permissioned querying for institutions.
+
+---
+
+## GTM Strategy
+
+**Phase 1 — Arena (Now)**
+Prove scoring works in a high-signal, crypto-native environment. Arena's structured API, smaller surface area, and onchain culture make it the ideal controlled proving ground.
+
+**Beachhead market:** DAOs evaluating contributors. Pain is real, decision-makers are reachable, use case is immediately legible to crypto-native judges.
+
+**Phase 2 — X Expansion**
+Enable X opt-in scoring via handle submission. Note: X API access is more restrictive and expensive — architecture should account for user-initiated data submission model as an alternative to programmatic pulling.
+
+**Phase 3 — Cross-Platform Reputation**
+Introduce unified reputation view across platforms. Same primitive, multiple ingestion sources.
+
+**Phase 4 — API for Governance and Decision Systems**
+Open API access for DAOs, hiring platforms, capital allocators.
+
+Target users across phases: analysts wanting proof of consistency, DAO contributors wanting verifiable track records, traders wanting credibility, platforms wanting signal filtering.
+
+---
+
+## Positioning Clarity
+
+Tessera is:
+- Infrastructure
+- A primitive
+- A base layer
+- A coordination tool
+
+It influences:
+- Governance
+- Capital allocation
+- Access decisions
+- Reputation-weighted systems
+
+It is not:
+- A social scoring gimmick
+- A growth hack tool
+- A vanity metric system
+- A "full of shit detector"
+
+**We expose patterns. We do not decide truth.**
+
+---
+
+## Production Philosophy (Video)
+
+Tone: calm, procedural, controlled. No hype energy. No startup pitch vibes.
+
+It should feel like a protocol launch — not a product demo.
+
+Key production beats:
+- Bridging line after problem section: "There's no infrastructure for this. Until now."
+- Score reveal gets 1.5 second silent beat before voiceover
+- Cursor hover over hash must be slow and deliberate
+- "Governance and capital allocation" — not "hiring"
+- Voiceover throughout — not heavy text overlays
+- Silence after final line — no music swell at close
+
+Score reveal language: **"Reputation computed."** — procedural, not emotional.
+
+Score reveal design: primary score, epoch label, methodology version, three sub-pillar scores, audit button. Clean typography. No bars, no badges, no tiers, no color-coded emotion, no confetti.
+
+> A report. Not a reward.
+
+---
+
+## Strategic Origin
+
+The original idea — Bannerus Maximus as a banner generator bot with gladiator vibes — expanded significantly through structured design thinking.
+
+Instead of: a quirky Arena banner bot.
+
+It evolved into: a structured reputation infrastructure layer with Arena as its proving ground.
+
+Bannerus Maximus now lives as the Arena interface — maintains thematic cohesion, cultural relevance, and memetic surface area — but does not constrain the protocol.
+
+The banner is the viral distribution layer.
+The scoring engine is the product.
+Tessera is the primitive.
+
+---
+
+## Where You Are Now
+
+- Naming locked
+- Architecture clear (three layers: ingestion, scoring engine, attestation)
+- Taxonomy locked (10 fixed categories)
+- Four pillars defined
+- Scoring model locked (absolute, equal weights, 0–100)
+- Update model locked (weekly epochs, on-demand preview)
+- Philosophy coherent
+- Script locked
+- Visual direction established
+- Tone defined
+- Demo flow agreed
+- Business model defined
+- GTM sequencing clear
+- Competitive differentiation articulated
+
+**You are in execution mode. Not concept mode.**

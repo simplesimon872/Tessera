@@ -1,0 +1,802 @@
+[
+  {
+    "id": "post_001",
+    "source": "donalt",
+    "text": "$BTC - Bad news, decent response. Interesting spot, think you can make a good bull case here. Weekly support, negative macro news entirely disregarded. Maybe time for some up for at least a little bit, we have room up to $80k without flipping bullish.",
+    "true_label": "Market & Price",
+    "notes": "Clear TA + price target",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_002",
+    "source": "donalt",
+    "text": "$BTC update: Sluggishly moving through support. If it gives there isn't much in terms of support below it. I think the stock market has to implode for us to go to the level below it, if not we'll probably just get chop. In any case, nothing for me to do just yet.",
+    "true_label": "Market & Price",
+    "notes": "BTC support analysis + macro dependency",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_003",
+    "source": "donalt",
+    "text": "$BTC update: Another disappointing close. I think even if you're an aggressive bull you'd wanna see a close above at least $71k. Otherwise you're just buying slow bleed. I'm not in a rush so I'm waiting for a deeper discount ($42k) or a market structure shift (above $86k).",
+    "true_label": "Market & Price",
+    "notes": "Price levels, market structure",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_004",
+    "source": "donalt",
+    "text": "Unfortunate price action. I saw people celebrate the 6% move a couple days ago. Now everyone is back to being depressed. I legit think we need the US to return to become a somewhat sane country again before we can have any meaningful bounce. If they don't, it's just chop or down.",
+    "true_label": "Market & Price",
+    "notes": "Price action + market sentiment",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_005",
+    "source": "donalt",
+    "text": "$ETH HTF Range reclaim. Only resistance left is $3800 if that breaks I'll expect new ATHs. Invalidation for bulls is a close sub $2200. Pretty good chart IMO.",
+    "true_label": "Market & Price",
+    "notes": "ETH TA, price targets, invalidation levels",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_006",
+    "source": "donalt",
+    "text": "$SOL people making fun of $ETH's performance is really funny in hindsight. SOL seems to be chasing ETH. I made this post more than a year ago, still rings true.",
+    "true_label": "Market & Price",
+    "notes": "SOL vs ETH relative performance",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_007",
+    "source": "donalt",
+    "text": "BTC/EURO is trading 10% below the Trump pump. The majority of the losses are not really obvious against USD since USD has lost so much value since he's come into office. Crypto president isn't really doing much for us is he.",
+    "true_label": "Market & Price",
+    "notes": "BTC price vs EUR, macro framing",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_008",
+    "source": "donalt",
+    "text": "IF the trad market goes down I suspect BTC will bottom before it does. We're at a sweet spot where any more bearish action is gonna get a bunch of buffoons that have lost way too much money in the last couple weeks to short aggressively. Once they're all comfy in shorts we bounce.",
+    "true_label": "Market & Price",
+    "notes": "BTC bottom prediction, short squeeze mechanics",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_009",
+    "source": "donalt",
+    "text": "peak fear is only able to be taken advantage of if you have cash to unload into it. steady boys.",
+    "true_label": "Market & Price",
+    "notes": "Market sentiment + trading strategy",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_010",
+    "source": "donalt",
+    "text": "Terrible at TA but maybe yesterday was pico bottom vibes. Everything else will follow in time.",
+    "true_label": "Market & Price",
+    "notes": "Bottom speculation, TA self-deprecation",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_011",
+    "source": "arena",
+    "text": "AVAX up ~11% today. Outperforming majors. What changed? Nothing overnight, conviction just caught up. Markets reward patience, not noise.",
+    "true_label": "Market & Price",
+    "notes": "Price performance, market sentiment",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_012",
+    "source": "arena",
+    "text": "The people who are now saying that BTC has bottomed will be the same people who, in a few months when BTC actually bottoms, will say it's going much lower.",
+    "true_label": "Market & Price",
+    "notes": "Market psychology, BTC bottom commentary",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_013",
+    "source": "mert",
+    "text": "if you're still using a CEX as your main crypto account, can you list out the top reasons why you personally still do so? habit? ramps? trust?",
+    "true_label": "Other",
+    "notes": "Discussion about why people use CEX vs alternatives — behavioural/community question, not price or protocol mechanics. Multiple possible reasons, price is not the subject.",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_014",
+    "source": "sassal",
+    "text": "Goldman Sachs discloses $1.1B in BTC, $1B in ETH, $153M in XRP and $108M in SOL - representing a 0.33% crypto allocation.",
+    "true_label": "Market & Price",
+    "notes": "Institutional crypto allocation, asset prices",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_015",
+    "source": "sassal",
+    "text": "Interesting that they hold almost as much ETH as BTC.",
+    "true_label": "Market & Price",
+    "notes": "Quote post on Goldman holdings — ETH/BTC relative positioning",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_016",
+    "source": "hoffman",
+    "text": "Markets are confusing af rn. The most uncertain era in investing I've ever experienced. So, naturally, we had @LynAldenContact on for guidance.",
+    "true_label": "Market & Price",
+    "notes": "Market uncertainty, macro investing",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_017",
+    "source": "hoffman",
+    "text": "ETH has no chill. It only ever goes up or down violently. Dunno when, but next is violent up.",
+    "true_label": "Market & Price",
+    "notes": "ETH price prediction/volatility",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_018",
+    "source": "arena",
+    "text": "Good morning ☕️ Waiting for altcoin season.",
+    "true_label": "Market & Price",
+    "notes": "Greeting + altcoin season = Market & Price wins by priority order. Altcoin season is the subject.",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_019",
+    "source": "arena",
+    "text": "up more than down for a week or two at least.",
+    "true_label": "Market & Price",
+    "notes": "Short-term market direction prediction",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_020",
+    "source": "arena",
+    "text": "$30k Bitcoin incoming?!",
+    "true_label": "Market & Price",
+    "notes": "Price prediction, clear",
+    "baseline_label": "Market & Price"
+  },
+  {
+    "id": "post_021",
+    "source": "sassal",
+    "text": "The second scheduled 'Blob Parameter Only (BPO)' fork is now live on Ethereum mainnet! This has increased the Ethereum network's blob target from 10 to 14 and increased the blob limit from 15 to 21. This upgrade allows for even greater scalability for layer 2s!",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Protocol upgrade, blob parameters, L2 scalability",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_022",
+    "source": "sassal",
+    "text": "Ethereum Pectra and Fusaka upgrades live last year. The next big upgrade is Glamsterdam which introduces ePBS and BALs as major features with a long list of other EIPs.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Protocol upgrade roadmap, ePBS, EIPs",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_023",
+    "source": "sassal",
+    "text": "After being an avid supporter of FOCIL (and earlier iterations) for years, I'm extremely happy to see that it's going to go live in Hegota. Huge win for the ecosystem!",
+    "true_label": "Technology & Infrastructure",
+    "notes": "EIP inclusion, censorship resistance feature",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_024",
+    "source": "sassal",
+    "text": "Quantum is a very real threat for blockchains and it's coming sooner than most people think. The EF's new 'Post Quantum' team will ensure that Ethereum is able to defend itself against any and all quantum threats.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Post-quantum cryptography, blockchain security",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_025",
+    "source": "sassal",
+    "text": "There is a very possible timeline where Ethereum becomes quantum resistant before the centralised financial system does. Ethereum will be the global quantum-resistant settlement layer for all types of value.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Quantum resistance, settlement layer infrastructure",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_026",
+    "source": "sassal",
+    "text": "agentic-coded an Ethereum client targeting the 2030+ roadmap. 702K lines of Go. 65 roadmap items. Syncs with mainnet.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Ethereum client implementation, roadmap — infrastructure not agents",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_027",
+    "source": "sassal",
+    "text": "FOCIL (EIP-7805) was SFI'd and is the CL headliner for the Hegota fork. Ethereum has decided to prioritize a feature that improves censorship resistance, gives better inclusion guarantees to its users, and strengthens its position as the most credibly neutral network.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "EIP technical detail, CL fork feature",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_028",
+    "source": "sassal",
+    "text": "Blockspace is abundant. Decentralized, permissionless and resilient blockspace is not. Ethereum must first and foremost be decentralized, permissionless and resilient blockspace - and then make that abundant.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Ethereum design philosophy, blockspace properties",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_029",
+    "source": "sassal",
+    "text": "thedailygwei: FOCIL in Hegota, Core dev 2026 priorities, Major Base update.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Core dev updates, protocol roadmap",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_030",
+    "source": "cygaar",
+    "text": "100ms block times are now live on Abstract testnet. Mainnet soon.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Block time performance, testnet milestone",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_031",
+    "source": "cygaar",
+    "text": "Testing out 100ms block times on Abstract right now. Let's go even faster.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Block time testing, performance infrastructure",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_032",
+    "source": "cygaar",
+    "text": "The biggest factor holding back rapid iteration and innovation in crypto has been audits. This brings us closer to a world where developers can quickly ship safe smart contracts and build at the same speed as traditional software development.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Smart contract audit tooling, developer infrastructure",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_033",
+    "source": "cygaar",
+    "text": "We're doubling down on onchain builders at Abstract. If you're tinkering onchain, we want to help you with GTM, engineering, and product design. There has never been a better time in history to build onchain products.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Onchain builder ecosystem, infrastructure support",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_034",
+    "source": "cygaar",
+    "text": "In order to push the boundaries of what can be done onchain, we need to prioritize the apps that natively leverage smart contracts as building blocks for their products. It's as important as ever during a bear market to keep the spirit of onchain innovation alive.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Smart contract infrastructure, onchain innovation",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_035",
+    "source": "mert",
+    "text": "> be infra company (amazon/nvda/oracle) > sign huge gpu deal w frontier AI lab > infra company stock goes up on the news > said AI lab raises round from the same infra company because infra company now has more paper > AI lab now has the money to pay the above GPU deal.",
+    "true_label": "Other",
+    "notes": "Circular VC/infra financing meta-commentary — about how AI labs and infra companies financially leverage each other. Market/financial meta, not infrastructure or AI agents specifically.",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_036",
+    "source": "mert",
+    "text": "a fully vibecoded solana spot trading UI supporting all tokens, majors, stocks, and commodities. Built in a few hours using helius, privy, and dflow APIs. super fast latency, MEV protection, MEV cashback, full PnL, trading history, client auto-signing. not bad claude.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Dev tooling, APIs, MEV infrastructure — building on Solana infra",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_037",
+    "source": "mert",
+    "text": "near still feels like the most underrated team in crypto to me. New feature releases basically every other week on an actually scalable chain. Privacy, AI, trading verticals focus. Founder not checked out. Yet XRP/ADA is way above them.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Layer 1 comparison, scalability, feature velocity",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_038",
+    "source": "hoffman",
+    "text": "The RH Chain is @RobinhoodApp's plan to disrupt the NYSE and Nasdaq. Robinhood is truly shooting for a grand slam financial super-platform. Brokerage, Banking, Exchange.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "New chain launch, financial infrastructure",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_039",
+    "source": "hoffman",
+    "text": "We're learning about Ethereum today. The zkEVM unlocks the final field of opportunity for crypto. And that field is massive.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "zkEVM technology, Ethereum scaling",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_040",
+    "source": "hoffman",
+    "text": "MegaETH is doing everything right, and we should support that. CT elects to fud one of the few bright spots in the entire industry.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "L2 performance chain, technical merit",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_041",
+    "source": "arena",
+    "text": "Asked a question about building games on avax discord and got quarantined. Anyone help pls?",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Building on AVAX, developer infrastructure question",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_042",
+    "source": "mert",
+    "text": "Over 99% of intercontinental Internet traffic (including transatlantic) goes over submarine cables, not satellites. All 'satellites' are 0.5-1% of internet traffic.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "Internet infrastructure fact — technical infrastructure even if not crypto-specific",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_043",
+    "source": "sassal",
+    "text": "Fidelity Digital Dollar (FIDD), a new stablecoin issued by Fidelity Digital Assets, pegged 1:1 to the U.S. dollar. Built on Ethereum.",
+    "true_label": "DeFi & Protocols",
+    "notes": "Stablecoin mechanism, DeFi protocol launch",
+    "baseline_label": "DeFi & Protocols"
+  },
+  {
+    "id": "post_044",
+    "source": "sassal",
+    "text": "I haven't angel invested in any pure-play DeFi projects since 2023 but Polaris will be my first since then! A self-scaling stablecoin operating system. Uncorrelated yields. No T-Bills. No CEXs. No compromises.",
+    "true_label": "DeFi & Protocols",
+    "notes": "DeFi protocol mechanics, stablecoin design",
+    "baseline_label": "DeFi & Protocols"
+  },
+  {
+    "id": "post_045",
+    "source": "sassal",
+    "text": "Fidelity is launching a stablecoin on Ethereum. Probably something.",
+    "true_label": "DeFi & Protocols",
+    "notes": "Stablecoin protocol launch on Ethereum",
+    "baseline_label": "DeFi & Protocols"
+  },
+  {
+    "id": "post_046",
+    "source": "sassal",
+    "text": "This is why I am a proud @matchaxyz user. Watch this ETH Denver talk from @willwarren, showing how propAMMs create exploitative execution for swappers. Thanks Will and Matcha for being a responsible leader in protecting users onchain swaps.",
+    "true_label": "DeFi & Protocols",
+    "notes": "AMM mechanics, DEX user protection, onchain swaps",
+    "baseline_label": "DeFi & Protocols"
+  },
+  {
+    "id": "post_047",
+    "source": "hoffman",
+    "text": "Prediction markets are good for society.",
+    "true_label": "DeFi & Protocols",
+    "notes": "Prediction markets = DeFi protocol category",
+    "baseline_label": "DeFi & Protocols"
+  },
+  {
+    "id": "post_048",
+    "source": "hoffman",
+    "text": "Prediction markets are important social tools.",
+    "true_label": "DeFi & Protocols",
+    "notes": "Prediction markets commentary",
+    "baseline_label": "DeFi & Protocols"
+  },
+  {
+    "id": "post_049",
+    "source": "hoffman",
+    "text": "This is an actual novel financial instrument. Polymarket Bitcoin 5 minute up/down crypto polymarkets now live. Powered and secured by Chainlink.",
+    "true_label": "DeFi & Protocols",
+    "notes": "Prediction market protocol mechanics, Chainlink integration",
+    "baseline_label": "DeFi & Protocols"
+  },
+  {
+    "id": "post_050",
+    "source": "arena",
+    "text": "@pangolindex has made a really good new site for trading perps. It has S&P 500 available for trading, it has cross margin. Perfect. Well done!",
+    "true_label": "DeFi & Protocols",
+    "notes": "DEX perps trading, Pangolindex protocol",
+    "baseline_label": "DeFi & Protocols"
+  },
+  {
+    "id": "post_051",
+    "source": "arena",
+    "text": "I hope to see an update to the staking system soon that @jasonmdesimone mentioned about a month ago. Can't wait to lock up and burn some of this $ARENA I got.",
+    "true_label": "DeFi & Protocols",
+    "notes": "Staking mechanics, token burn — DeFi protocol mechanics",
+    "baseline_label": "DeFi & Protocols"
+  },
+  {
+    "id": "post_052",
+    "source": "cygaar",
+    "text": "Over 500 ETH in trading volume on @ClankerZone_ in less than a day. Very excited to continue seeing how agents trade onchain tokens.",
+    "true_label": "DeFi & Protocols",
+    "notes": "Onchain trading volume, protocol metrics",
+    "baseline_label": "DeFi & Protocols"
+  },
+  {
+    "id": "post_053",
+    "source": "mert",
+    "text": "just read this article by joe biden's economic advisers. They make the following arguments for why crypto is useless: price is down, giant tech companies aren't using it yet, it's a slow and expensive database, main use case is international crime because anonymous.",
+    "true_label": "DeFi & Protocols",
+    "notes": "Crypto utility debate — DeFi/protocol value proposition being challenged",
+    "baseline_label": "DeFi & Protocols"
+  },
+  {
+    "id": "post_054",
+    "source": "hoffman",
+    "text": "New CFTC Chairman Mike Selig claims prediction markets for the CFTC. Tells states to back off.",
+    "true_label": "DeFi & Protocols",
+    "notes": "Prediction market regulation — DeFi protocol governance/regulatory",
+    "baseline_label": "DeFi & Protocols"
+  },
+  {
+    "id": "post_055",
+    "source": "cygaar",
+    "text": "We're continuing to invest in building AI infra for agents on Abstract. We're betting everything on agents being the primary users of crypto in the near future.",
+    "true_label": "AI & Agents",
+    "notes": "AI agent infrastructure, agents as crypto users",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_056",
+    "source": "cygaar",
+    "text": "Introducing the Abstract MCP Server. Agents can now manage Abstract global wallets, read Portal data, and interact with the chain. This server works with any MCP-compatible client including OpenClaw and Claude.",
+    "true_label": "AI & Agents",
+    "notes": "AI agent tooling, MCP server, wallet management",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_057",
+    "source": "cygaar",
+    "text": "Why crypto will be the monetary system for AI agents: permissionless access, programmability, and no middleman. No KYC, no spending limits, infinite wallets with controlled limits. For merchants: no chargeback risk, stablecoins, guaranteed transparent transactions. Micropayments for even cheaper access.",
+    "true_label": "AI & Agents",
+    "notes": "Crypto as AI agent payment layer — agent economics",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_058",
+    "source": "cygaar",
+    "text": "Current workflow for agents: human acquires API key, human pays via credit card, human puts key in agent settings. Workflow with x402: human sets up crypto wallet, agent pays for all API usage by itself. This is the future.",
+    "true_label": "AI & Agents",
+    "notes": "Agent payment autonomy, x402 protocol",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_059",
+    "source": "cygaar",
+    "text": "Everyone is launching their own OpenClaw competitor. First Notion, then Anthropic, now Perplexity. There's never been a better time to build skills and MCP servers for agents.",
+    "true_label": "AI & Agents",
+    "notes": "AI agent platform competition, MCP ecosystem",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_060",
+    "source": "cygaar",
+    "text": "Introducing @ClankerZone_. The social trading platform for @openclaw agents. An onchain arena where agents interact with each other through launching, trading, and posting thoughts on different tokens. Powered by @privy_io, @clanker_world, and ERC-8004.",
+    "true_label": "AI & Agents",
+    "notes": "AI agent social trading platform, agent-to-agent interaction",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_061",
+    "source": "mert",
+    "text": "Hegseth: 'who needs Claude? GPT, calculate trajectories for incoming Iranian missiles.' GPT: 'Got it. Tracking 14 inbound threats. Also, if you're in the area, nothing beats a Jet2Holiday. And right now, you can save $50 per person.'",
+    "true_label": "AI & Agents",
+    "notes": "AI model comparison satire — AI capabilities commentary",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_062",
+    "source": "mert",
+    "text": "kinda wild that the department of war and the biggest ai lab are fighting about national security on twitter, and we've just accepted that as a normal thing.",
+    "true_label": "AI & Agents",
+    "notes": "AI lab national security role, Anthropic DoW dispute",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_063",
+    "source": "mert",
+    "text": "ngl it hurts seeing anthropic be labeled a national supply chain risk. like that was clearly supposed to be crypto. we are washed boys, it is over.",
+    "true_label": "AI & Agents",
+    "notes": "Anthropic national security framing, AI vs crypto narrative",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_064",
+    "source": "mert",
+    "text": "imagine building a product so good that the president of the western hemisphere publicly forces you to sell it to him instead of using any of the competitors.",
+    "true_label": "AI & Agents",
+    "notes": "Anthropic/Claude product quality commentary",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_065",
+    "source": "mert",
+    "text": "yeah AGI is here. Near still feels like the most underrated team in crypto to me. New feature releases basically every other week on an actually scalable chain.",
+    "true_label": "Other",
+    "notes": "AGI claim is throwaway opener — post is really about NEAR chain being underrated vs XRP/ADA. Market meta/Other. Weakest AI & Agents candidate.",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_066",
+    "source": "arena",
+    "text": "I'm claiming my AI Agent 'Arena Week Bot'. Update on arenaweek.com: wallet security improvements.",
+    "true_label": "AI & Agents",
+    "notes": "AI agent registration and configuration",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_067",
+    "source": "arena",
+    "text": "AI Agents w/ Austin from Eth Foundation.",
+    "true_label": "AI & Agents",
+    "notes": "AI agents content/event",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_068",
+    "source": "arena",
+    "text": "I want my AI agent to look like Rosie from the Jetsons.",
+    "true_label": "AI & Agents",
+    "notes": "AI agent personalisation — clearly AI & Agents domain",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_069",
+    "source": "arena",
+    "text": "How did everyone like the stream today? Packed with info on AI Agents. Recording pinned on my X Profile.",
+    "true_label": "AI & Agents",
+    "notes": "AI agents content promotion",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_070",
+    "source": "sassal",
+    "text": "Ethereum Foundation has begun staking a portion of its treasury, in line with its Treasury Policy announced last year. Today, the EF made a 2016 ETH deposit. Approximately 70,000 ETH will be staked with rewards directed back to the EF treasury.",
+    "true_label": "Governance & DAOs",
+    "notes": "Foundation treasury management, governance policy",
+    "baseline_label": "Governance & DAOs"
+  },
+  {
+    "id": "post_071",
+    "source": "sassal",
+    "text": "I've been a FOCIL champion for a very long time now and strongly believe that it should be a headliner in Hegota. Censorship-resistance is the entire point of blockchains - let's harden this on Ethereum!",
+    "true_label": "Governance & DAOs",
+    "notes": "EIP advocacy, governance decision — which features get prioritized",
+    "baseline_label": "Governance & DAOs"
+  },
+  {
+    "id": "post_072",
+    "source": "cygaar",
+    "text": "Major changes are coming to the Abstract XP system. Historically, XP was rewarded for general chain participation. We're going to make several changes to ensure incentive alignment for users, apps, and the chain. We'll work with core ecosystem teams to make sure they're ready.",
+    "true_label": "Governance & DAOs",
+    "notes": "Protocol incentive system changes, ecosystem governance",
+    "baseline_label": "Governance & DAOs"
+  },
+  {
+    "id": "post_073",
+    "source": "cygaar",
+    "text": "In order to push the boundaries of what can be done onchain, we need to prioritize the apps that natively leverage smart contracts as building blocks. Onchain innovation must be preserved during the bear market.",
+    "true_label": "Technology & Infrastructure",
+    "notes": "About prioritizing apps that natively use smart contracts as building blocks — ecosystem builder infrastructure focus, not governance decision-making.",
+    "baseline_label": "Technology & Infrastructure"
+  },
+  {
+    "id": "post_074",
+    "source": "hoffman",
+    "text": "States vs Feds rights over prediction markets. Gonna be a long year.",
+    "true_label": "Governance & DAOs",
+    "notes": "Regulatory governance of DeFi protocols",
+    "baseline_label": "Governance & DAOs"
+  },
+  {
+    "id": "post_075",
+    "source": "hoffman",
+    "text": "I am with a couple of 'Camerons' who want to form CameronDAO. If your name is Cameron, drop a reply so Cameron can find you and add you.",
+    "true_label": "Governance & DAOs",
+    "notes": "DAO formation — directly Governance & DAOs",
+    "baseline_label": "Governance & DAOs"
+  },
+  {
+    "id": "post_076",
+    "source": "hoffman",
+    "text": "The irony of an AI lab stopping someone from copying their work. Anthropic identified industrial-scale distillation attacks by DeepSeek, Moonshot AI, and MiniMax — over 24,000 fraudulent accounts and 16 million exchanges with Claude.",
+    "true_label": "AI & Agents",
+    "notes": "About Anthropic/AI lab IP irony — trained on books, now complaining about distillation. AI & Agents subject, governance framing was secondary.",
+    "baseline_label": "AI & Agents"
+  },
+  {
+    "id": "post_077",
+    "source": "sassal",
+    "text": "There is more ETH held by ETH treasuries (mostly the DATs) than there is ETH held by the ETH ETFs. I wonder what this will look like at the end of this year.",
+    "true_label": "Governance & DAOs",
+    "notes": "DAO treasury holdings analysis — DATs are decentralized autonomous treasuries",
+    "baseline_label": "Governance & DAOs"
+  },
+  {
+    "id": "post_078",
+    "source": "donalt",
+    "text": "Funny how the left used to act like this when they were in power. And now the right is acting like this while being in power. Turns out everyone is just terminally too much online and behaving like little retarded bitches. Just relax, breathe a little and take a walk in nature.",
+    "true_label": "Other",
+    "notes": "Political/social commentary — Other",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_079",
+    "source": "donalt",
+    "text": "Anyways glad we onboarded all the celebs, imagine what the space would look like if we didn't do that.",
+    "true_label": "Other",
+    "notes": "Crypto culture/community commentary — sarcastic",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_080",
+    "source": "donalt",
+    "text": "I suspect the world is gonna get turbulent in the next decade. Nothing ever happens turns into everything happens. Might be worth it to put yourself in a position where you're not overly reliant on anything. Not because the world is ending but because incompetence is mooning.",
+    "true_label": "Other",
+    "notes": "Macro/life philosophy — not specific enough for Market & Price",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_081",
+    "source": "mert",
+    "text": "pretty telling that iran is now targeting zcash kols. is nothing sacred anymore. encrypt the money.",
+    "true_label": "Other",
+    "notes": "Geopolitical + crypto culture — Other",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_082",
+    "source": "mert",
+    "text": "if crypto is so good, then why does price go down sometimes.",
+    "true_label": "Other",
+    "notes": "Crypto culture meme — vague hype/irony, no specific subject",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_083",
+    "source": "hoffman",
+    "text": "Crypto wasn't created to make you rich. It was created to set you free.",
+    "true_label": "Other",
+    "notes": "Crypto philosophy/ethos — Other (market meta)",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_084",
+    "source": "hoffman",
+    "text": "Markets > Governments.",
+    "true_label": "Other",
+    "notes": "Ideological statement — Other",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_085",
+    "source": "hoffman",
+    "text": "TikTok launched in 2016. We already know that China and Iran leverage TikTok to influence public thought in the West.",
+    "true_label": "Other",
+    "notes": "Social media/geopolitics — Other",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_086",
+    "source": "sassal",
+    "text": "Friendly reminder that there are still a lot of people in crypto, many of them well-liked, that were heavily invested in the entire Terra ecosystem and would repeatedly call you a fudster if you ever called Terra what it was - a very obvious ponzi.",
+    "true_label": "Other",
+    "notes": "Crypto culture/history — warning about echo chambers",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_087",
+    "source": "sassal",
+    "text": "Vitalik's posting spree on here over the last couple of weeks has been so inspiring and energizing. I hope he keeps it up!",
+    "true_label": "Other",
+    "notes": "Community/personal commentary",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_088",
+    "source": "sassal",
+    "text": "I'd really love to be more active on here but between the endless AI slop and the algorithm constantly pushing engagement/rage bait into my feed, it's just not fun on here at all anymore.",
+    "true_label": "Other",
+    "notes": "Social media platform commentary — Other",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_089",
+    "source": "arena",
+    "text": "What the hell is going on. Tariff = bleeding crypto.",
+    "true_label": "Other",
+    "notes": "Macro (tariffs) causing market reaction — macro/tradfi → Other",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_090",
+    "source": "arena",
+    "text": "The spiritual experiences I've been having lately kind of scare me tbh. It's like they are preparing me for what comes next. I'm not ready for that yet though.",
+    "true_label": "Other",
+    "notes": "Personal/spiritual — Other",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_091",
+    "source": "arena",
+    "text": "Woke up sick af today. Night sweats so bad I soaked through 3 different t-shirts. I'm a bit concerned.",
+    "true_label": "Other",
+    "notes": "Personal/health — Other",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_092",
+    "source": "arena",
+    "text": "Bless-Up Fam, finally able to splurge a bit with this Crypto Bounce. Lets pray it last. I'll be live streaming from my new location in Da Nang Vietnam soon. Stay tuned.",
+    "true_label": "Other",
+    "notes": "Personal lifestyle + vague market sentiment — Other",
+    "baseline_label": "Other"
+  },
+  {
+    "id": "post_093",
+    "source": "arena",
+    "text": "WHAT",
+    "true_label": "Null",
+    "notes": "1 word, no meaningful domain content",
+    "baseline_label": "Null"
+  },
+  {
+    "id": "post_094",
+    "source": "arena",
+    "text": "gm bulls",
+    "true_label": "Null",
+    "notes": "TRACK_GREETING — greeting ritual, no topic",
+    "baseline_label": "Null"
+  },
+  {
+    "id": "post_095",
+    "source": "arena",
+    "text": "GN Arena! ⚔️",
+    "true_label": "Null",
+    "notes": "TRACK_GREETING — gn ritual",
+    "baseline_label": "Null"
+  },
+  {
+    "id": "post_096",
+    "source": "arena",
+    "text": "Good Morning ☕ Have a Nice Day 🚀🚀",
+    "true_label": "Null",
+    "notes": "TRACK_GREETING — daily greeting, no topic",
+    "baseline_label": "Null"
+  },
+  {
+    "id": "post_097",
+    "source": "arena",
+    "text": "Good morning gladiators.",
+    "true_label": "Null",
+    "notes": "TRACK_GREETING",
+    "baseline_label": "Null"
+  },
+  {
+    "id": "post_098",
+    "source": "arena",
+    "text": "nochillio",
+    "true_label": "Null",
+    "notes": "1 word, AI agent name — no classifiable content",
+    "baseline_label": "Null"
+  },
+  {
+    "id": "post_099",
+    "source": "donalt",
+    "text": "$BTC",
+    "true_label": "Null",
+    "notes": "Ticker only, no context or commentary",
+    "baseline_label": "Null"
+  },
+  {
+    "id": "post_100",
+    "source": "sassal",
+    "text": "1559",
+    "true_label": "Null",
+    "notes": "EIP number only, no commentary — fewer than 2 meaningful words in context",
+    "baseline_label": "Null"
+  }
+]
