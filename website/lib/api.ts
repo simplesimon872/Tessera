@@ -79,39 +79,39 @@ export interface LeaderboardEntry {
 
 export async function getProfile(handle: string): Promise<ProfileData | null> {
   try {
-    const res = await fetch(`${API_URL}/api/score/${handle}`, {
-      next: { revalidate: 60 },
-    })
+    const url = `${API_URL}/api/score/${handle}`
+    console.log(`[tessera] getProfile → ${url}`)
+    const res = await fetch(url, { cache: 'no-store' })
+    console.log(`[tessera] getProfile ← ${res.status}`)
     if (!res.ok) return null
     const json = await res.json()
     return json.ok ? json.data : null
-  } catch {
+  } catch (e) {
+    console.error(`[tessera] getProfile failed for ${handle}:`, e)
     return null
   }
 }
 
 export async function getAudit(epochId: string): Promise<AuditData | null> {
   try {
-    const res = await fetch(`${API_URL}/api/audit/${epochId}`, {
-      next: { revalidate: 300 },
-    })
+    const res = await fetch(`${API_URL}/api/audit/${epochId}`, { cache: 'no-store' })
     if (!res.ok) return null
     const json = await res.json()
     return json.ok ? json.data : null
-  } catch {
+  } catch (e) {
+    console.error(`[tessera] getAudit failed for ${epochId}:`, e)
     return null
   }
 }
 
 export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   try {
-    const res = await fetch(`${API_URL}/api/leaderboard`, {
-      next: { revalidate: 120 },
-    })
+    const res = await fetch(`${API_URL}/api/leaderboard`, { cache: 'no-store' })
     if (!res.ok) return []
     const json = await res.json()
     return json.ok ? json.data : []
-  } catch {
+  } catch (e) {
+    console.error(`[tessera] getLeaderboard failed:`, e)
     return []
   }
 }

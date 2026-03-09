@@ -63,13 +63,14 @@ export default async function LeaderboardPage() {
           {/* Full table */}
           <div className="fade-in fade-in-3">
             {/* Table header */}
-            <div className="grid grid-cols-7 gap-4 px-5 py-3 border-b border-border">
+            <div className="grid grid-cols-8 gap-2 px-5 py-3 border-b border-border">
               <p className="font-mono text-xs text-muted col-span-1">#</p>
               <p className="font-mono text-xs text-muted col-span-2">Handle</p>
               <p className="font-mono text-xs text-muted text-right">Composite</p>
               <p className="font-mono text-xs text-muted text-right hidden sm:block">Orig.</p>
               <p className="font-mono text-xs text-muted text-right hidden sm:block">Focus</p>
-              <p className="font-mono text-xs text-muted text-right hidden sm:block">Status</p>
+              <p className="font-mono text-xs text-muted text-right hidden sm:block">Cons.</p>
+              <p className="font-mono text-xs text-muted text-right hidden sm:block">Depth</p>
             </div>
 
             {/* Rows */}
@@ -78,12 +79,12 @@ export default async function LeaderboardPage() {
                 <Link
                   key={entry.handle}
                   href={`/${entry.handle}`}
-                  className="grid grid-cols-7 gap-4 px-5 py-4 bg-surface border-b border-border hover:bg-border/30 transition-colors group items-center"
+                  className="grid grid-cols-8 gap-2 px-5 py-4 bg-surface border-b border-border hover:bg-border/30 transition-colors group items-center"
                 >
                   <p className="font-mono text-xs text-muted col-span-1">
                     {index + 1}
                   </p>
-                  <p className="font-sans font-semibold text-sm col-span-2 group-hover:text-accent transition-colors">
+                  <p className="font-sans font-semibold text-sm col-span-2 group-hover:text-accent transition-colors truncate">
                     @{entry.handle}
                   </p>
                   <p className="font-mono text-sm text-accent text-right">
@@ -95,10 +96,11 @@ export default async function LeaderboardPage() {
                   <p className="font-mono text-xs text-muted text-right hidden sm:block">
                     {formatScore(entry.focus)}
                   </p>
-                  <p className={`font-mono text-xs text-right hidden sm:block ${
-                    entry.status === 'sealed' ? 'text-sealed' : 'text-muted'
-                  }`}>
-                    {entry.status === 'sealed' ? 'SEALED' : 'LIVE'}
+                  <p className="font-mono text-xs text-muted text-right hidden sm:block">
+                    {formatScore(entry.consistency)}
+                  </p>
+                  <p className="font-mono text-xs text-muted text-right hidden sm:block">
+                    {formatScore(entry.depth)}
                   </p>
                 </Link>
               ))}
