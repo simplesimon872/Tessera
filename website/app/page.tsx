@@ -13,7 +13,7 @@ export default async function HomePage() {
   let topEntries: any[] = []
   try {
     const leaderboard = await getLeaderboard()
-    topEntries = (leaderboard?.entries as unknown as any[])?.slice(0, 3) ?? []
+    topEntries = (leaderboard as unknown as any[])?.slice(0, 3) ?? []
   } catch {
     topEntries = []
   }
@@ -63,9 +63,58 @@ export default async function HomePage() {
         </div>
       </div>
 
+      {/* Bot commands */}
+      <div className="fade-in fade-in-3 mb-20">
+        <p className="font-mono text-xs text-muted tracking-widest uppercase mb-8">
+          Bot commands
+        </p>
+        <div className="space-y-px">
+          {[
+            {
+              command: '@bannerusmaximus claim',
+              label: 'CLAIM',
+              desc: 'Activate your Tessera record. Run this once to register your account and start accruing epochs.',
+            },
+            {
+              command: '@bannerusmaximus reveal',
+              label: 'REVEAL',
+              desc: 'Score your current epoch. Pulls your last 30 days of posts and returns your full behavioral breakdown.',
+            },
+            {
+              command: '@bannerusmaximus inspect @handle',
+              label: 'INSPECT',
+              desc: "View another account's latest epoch scores. Works on any registered Tessera user.",
+            },
+          ].map(({ command, label, desc }) => (
+            <div key={label} className="bg-surface border-b border-border p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="sm:w-48 shrink-0">
+                <span className="font-mono text-xs text-accent border border-accent/30 bg-accent/5 px-2 py-1">
+                  {label}
+                </span>
+              </div>
+              <div className="flex-1">
+                <p className="font-mono text-sm text-primary mb-1">{command}</p>
+                <p className="font-sans text-xs text-muted">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="border border-border border-t-0 px-6 py-4 flex items-center justify-between">
+          <p className="font-mono text-xs text-muted">Rate limit: 5 commands per user per hour</p>
+          <a
+            href="https://arena.social"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-xs text-accent hover:text-primary transition-colors"
+          >
+            Open Arena →
+          </a>
+        </div>
+      </div>
+
       {/* Top 3 preview */}
       {topEntries.length > 0 && (
-        <div className="fade-in fade-in-3 mb-12">
+        <div className="fade-in fade-in-4 mb-12">
           <div className="flex items-center justify-between mb-6">
             <p className="font-mono text-xs text-muted tracking-widest uppercase">
               Top accounts
@@ -96,7 +145,7 @@ export default async function HomePage() {
       )}
 
       {/* CTA */}
-      <div className="fade-in fade-in-4 border border-border p-8">
+      <div className="fade-in fade-in-5 border border-border p-8">
         <p className="font-mono text-xs text-accent mb-3">CLAIM YOUR TESSERA</p>
         <p className="font-sans text-sm text-muted mb-6">
           Tag <span className="font-mono text-primary">@bannerusmaximus claim</span> on Arena
