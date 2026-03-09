@@ -81,7 +81,7 @@ export async function getProfile(handle: string): Promise<ProfileData | null> {
   try {
     const url = `${API_URL}/api/score/${handle}`
     console.log(`[tessera] getProfile → ${url}`)
-    const res = await fetch(url, { cache: 'no-store' })
+    const res = await fetch(url, { headers: {} })
     console.log(`[tessera] getProfile ← ${res.status}`)
     if (!res.ok) return null
     const json = await res.json()
@@ -94,7 +94,7 @@ export async function getProfile(handle: string): Promise<ProfileData | null> {
 
 export async function getAudit(epochId: string): Promise<AuditData | null> {
   try {
-    const res = await fetch(`${API_URL}/api/audit/${epochId}`, { cache: 'no-store' })
+    const res = await fetch(`${API_URL}/api/audit/${epochId}`, { headers: {} })
     if (!res.ok) return null
     const json = await res.json()
     return json.ok ? json.data : null
@@ -106,7 +106,7 @@ export async function getAudit(epochId: string): Promise<AuditData | null> {
 
 export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   try {
-    const res = await fetch(`${API_URL}/api/leaderboard`, { cache: 'no-store' })
+    const res = await fetch(`${API_URL}/api/leaderboard`, { headers: {} })
     if (!res.ok) return []
     const json = await res.json()
     return json.ok ? json.data : []
