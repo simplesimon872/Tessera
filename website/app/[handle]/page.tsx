@@ -5,12 +5,13 @@ import Link from 'next/link'
 export const runtime = 'edge'
 
 interface PageProps {
-  params: { handle: string }
+  params: Promise<{ handle: string }>
 }
 
 export async function generateMetadata({ params }: PageProps) {
+  const { handle } = await params
   return {
-    title: `@${params.handle} — Tessera`,
+    title: `@${handle} — Tessera`,
     description: `Behavioral epoch record for @${params.handle} on Tessera.`,
   }
 }
@@ -36,7 +37,8 @@ function extractAnchor(epoch: any) {
 }
 
 export default async function ProfilePage({ params }: PageProps) {
-  const handle = params.handle.toLowerCase()
+  const { handle: rawHandle } = await params
+  const handle = rawHandle.toLowerCase()
   const profile = await getProfile(handle)
 
   if (!profile) {
