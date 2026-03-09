@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: PageProps) {
   const { handle } = await params
   return {
     title: `@${handle} — Tessera`,
-    description: `Behavioral epoch record for @${params.handle} on Tessera.`,
+    description: `Behavioral epoch record for @${handle} on Tessera.`,
   }
 }
 
