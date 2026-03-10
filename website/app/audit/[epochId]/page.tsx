@@ -148,10 +148,87 @@ export default async function AuditPage({ params }: PageProps) {
       {/* Snapshot hash */}
       <div className="fade-in fade-in-4 bg-surface border-b border-border p-6 mb-px">
         <p className="font-mono text-xs text-muted tracking-widest uppercase mb-3">Snapshot hash</p>
-        <p className="font-mono text-xs text-primary break-all">{audit.snapshot_hash ?? '—'}</p>
-        <p className="font-mono text-xs text-muted mt-2">
-          SHA-256 of canonical JSON snapshot. Reproduce by hashing the snapshot_json field above with the same methodology.
+        <p className="font-mono text-xs text-primary break-all mb-2">{audit.snapshot_hash ?? '—'}</p>
+        <p className="font-mono text-xs text-muted">
+          SHA-256 of the canonical scoring snapshot. This hash is what gets written onchain.
         </p>
+      </div>
+
+      {/* How to verify */}
+      <div className="fade-in fade-in-4 bg-surface border-b border-border p-6 mb-px">
+        <p className="font-mono text-xs text-accent tracking-widest uppercase mb-4">How to verify this score</p>
+        <p className="font-sans text-xs text-muted mb-6">
+          Anyone can independently reproduce this hash and confirm it matches what is stored onchain.
+          If the hash matches, the score has not been altered since sealing.
+        </p>
+
+        <div className="space-y-6">
+
+          {/* Step 1 */}
+          <div>
+            <p className="font-mono text-xs text-primary mb-2">01 — Copy the snapshot JSON</p>
+            <p className="font-sans text-xs text-muted">
+              The full scoring snapshot is stored in the database and visible via the API at{' '}
+              <span className="font-mono text-accent">/api/audit/{epochId}</span>.
+              The <span className="font-mono">snapshot_json</span> field contains every input used to produce this score.
+            </p>
+          </div>
+
+          {/* Step 2 */}
+          <div>
+            <p className="font-mono text-xs text-primary mb-2">02 — Reproduce the hash</p>
+            <p className="font-sans text-xs text-muted mb-3">
+              Run the following Python snippet with the snapshot JSON:
+            </p>
+            <div className="bg-bg border border-border p-4">
+              <pre className="font-mono text-xs text-muted whitespace-pre-wrap leading-relaxed">{`import json, hashlib
+
+# Paste snapshot_json here
+snapshot = { ...paste full JSON object... }
+
+canonical = json.dumps(
+    snapshot,
+    sort_keys=True,
+    separators=(',', ':'),
+    ensure_ascii=False
+)
+result = hashlib.sha256(canonical.encode('utf-8')).hexdigest()
+print(result)
+# Should match: ${audit.snapshot_hash ?? '—'}`}</pre>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div>
+            <p className="font-mono text-xs text-primary mb-2">03 — Check onchain</p>
+            <p className="font-sans text-xs text-muted mb-3">
+              If the hash you computed matches the snapshot hash above, and that hash matches the{' '}
+              <span className="font-mono">snapshotHash</span> argument in the Snowtrace transaction,
+              the score is verified. No tampering has occurred.
+            </p>
+            {audit.anchor && (
+              <a
+                href={audit.anchor.snowtrace_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-xs text-accent hover:text-primary transition-colors"
+              >
+                View transaction on Snowtrace →
+              </a>
+            )}
+          </div>
+
+          {/* Why it works */}
+          <div className="border-l-2 border-accent/30 pl-4">
+            <p className="font-mono text-xs text-muted leading-relaxed">
+              Changing any score by 0.01, altering a post count, or modifying any field in the snapshot
+              produces a completely different hash — making the discrepancy immediately detectable.
+              The scoring rules (prompt version, methodology version, model) are also written into the
+              snapshot, so any change to the classification logic is visible in the hash.
+            </p>
+          </div>
+
+        </div>
       </div>
 
       {/* Disclaimer */}
