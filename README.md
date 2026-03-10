@@ -377,7 +377,7 @@ Tessera/
 
 ## Smart Contract
 
-`TesseraAnchor.sol` is deployed on Avalanche Fuji testnet during development, with mainnet deployment planned before production launch.
+`TesseraAnchor.sol` is deployed on Avalanche C-Chain mainnet.
 
 Each attestation stores:
 - `handle` — Arena handle
@@ -412,7 +412,7 @@ Once written, attestations are immutable. The contract contains no administrativ
 - The `build` script in `package.json` runs `next build` (not `next-on-pages`) to avoid a recursive invocation loop when `next-on-pages` internally calls `vercel build` which calls `npm run build`
 
 ### Before Mainnet Production
-- Deploy `TesseraAnchor.sol` to Avalanche C-Chain mainnet via Remix
+- Contract already deployed to Avalanche C-Chain mainnet
 - Update `CONTRACT_ADDRESS` in `.env` with mainnet address
 - Restore `MIN_POST_THRESHOLD` to 20 and handler gates to `20 total / 5 active`
 - Update CORS in `api/app.py` to include final production domain
