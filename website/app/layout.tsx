@@ -2,12 +2,14 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://tessera-8x7.pages.dev'),
   title: 'Tessera — Onchain Behavioral Attestation',
   description: 'Verifiable behavioral records for Arena social accounts. Sealed onchain on Avalanche.',
   openGraph: {
     title: 'Tessera',
     description: 'Onchain behavioral attestation protocol for Arena.',
     type: 'website',
+    url: 'https://tessera-8x7.pages.dev',
   },
 }
 
