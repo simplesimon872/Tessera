@@ -35,7 +35,7 @@ export default function RootLayout({
                 Leaderboard
               </a>
               <a
-                href="https://arena.social"
+                href="https://arena.social/?ref=SimpleSimon872"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-mono text-xs bg-accent text-bg px-3 py-1.5 hover:bg-primary transition-colors tracking-wider uppercase font-medium"

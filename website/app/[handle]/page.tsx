@@ -196,7 +196,7 @@ export default async function ProfilePage({ params }: PageProps) {
             it won&apos;t be sealed onchain until they activate.
           </p>
           <a
-            href="https://arena.social"
+            href="https://arena.social/?ref=SimpleSimon872"
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono text-xs text-bg bg-accent px-4 py-2 hover:bg-primary transition-colors"
@@ -219,7 +219,7 @@ function NotFoundState({ handle }: { handle: string }) {
         No Tessera record exists for this handle yet.
       </p>
       <a
-        href="https://arena.social"
+        href="https://arena.social/?ref=SimpleSimon872"
         target="_blank"
         rel="noopener noreferrer"
         className="font-mono text-xs text-bg bg-accent px-6 py-3 hover:bg-primary transition-colors"

@@ -131,7 +131,7 @@ function EmptyState() {
         Be the first to claim your Tessera.
       </p>
       <a
-        href="https://arena.social"
+        href="https://arena.social/?ref=SimpleSimon872"
         target="_blank"
         rel="noopener noreferrer"
         className="font-mono text-xs text-bg bg-accent px-6 py-3 hover:bg-primary transition-colors"

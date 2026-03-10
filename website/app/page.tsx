@@ -102,7 +102,7 @@ export default async function HomePage() {
         <div className="border border-border border-t-0 px-6 py-4 flex items-center justify-between">
           <p className="font-mono text-xs text-muted">Rate limit: 5 commands per user per hour</p>
           <a
-            href="https://arena.social"
+            href="https://arena.social/?ref=SimpleSimon872"
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono text-xs text-accent hover:text-primary transition-colors"
@@ -153,7 +153,7 @@ export default async function HomePage() {
         </p>
         <div className="flex flex-wrap gap-4">
           <a
-            href="https://arena.social"
+            href="https://arena.social/?ref=SimpleSimon872"
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono text-xs text-bg bg-accent px-4 py-2 hover:bg-primary transition-colors"
