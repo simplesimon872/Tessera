@@ -116,6 +116,24 @@ class BannerusClient:
         logger.info(f"Posted | id={str(thread.get('id', '?'))[:8]}…")
         return thread
 
+    def create_reply(self, content: str, thread_id: str) -> dict:
+        """
+        Post a reply to an existing thread as @bannerusmaximus.
+        Sets answerId so the reply threads under the triggering post —
+        visible to anyone reading that thread, not just as a standalone post.
+        Returns full thread dict from response.
+        """
+        data = self._post_req("/threads", {
+            "content":       content,
+            "files":         [],
+            "privacyType":   0,
+            "hasURLPreview": False,
+            "answerId":      thread_id,
+        })
+        thread = data.get("thread", {})
+        logger.info(f"Replied | thread={thread_id[:8]}… | id={str(thread.get('id', '?'))[:8]}…")
+        return thread
+
     # ── User lookup ───────────────────────────────────────────────────────────
 
     def get_user_by_handle(self, handle: str) -> dict:
