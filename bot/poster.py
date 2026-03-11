@@ -197,17 +197,17 @@ def format_seal_notification(handle, epoch, anchor):
     )
 
 
-def send_reply(client, content, thread_id: str = None):
+def send_reply(client, content, thread_id: str = None, user_id: str = None):
     """
     Post a reply to Arena.
 
-    If thread_id is provided, replies in-thread under the triggering post
-    (visible to anyone reading that thread). Falls back to a standalone
-    top-level post if thread_id is not available.
+    If thread_id and user_id are provided, replies in-thread under the
+    triggering post using /threads/answer (confirmed working endpoint).
+    Falls back to a standalone top-level post if either is missing.
     """
     try:
-        if thread_id:
-            thread = client.create_reply(content, thread_id)
+        if thread_id and user_id:
+            thread = client.create_reply(content, thread_id, user_id)
         else:
             thread = client.create_post(content)
         logger.info(f"Posted reply | id={thread.get('id', '?')[:8]}…")

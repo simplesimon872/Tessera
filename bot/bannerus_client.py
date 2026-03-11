@@ -116,20 +116,28 @@ class BannerusClient:
         logger.info(f"Posted | id={str(thread.get('id', '?'))[:8]}…")
         return thread
 
-    def create_reply(self, content: str, thread_id: str) -> dict:
+    def create_reply(self, content: str, thread_id: str, user_id: str) -> dict:
         """
         Post a reply to an existing thread as @bannerusmaximus.
-        Sets answerId so the reply threads under the triggering post —
-        visible to anyone reading that thread, not just as a standalone post.
-        Returns full thread dict from response.
+
+        Uses the /threads/answer endpoint on api.starsarena.com —
+        confirmed working from StarsBeggar repo. Note: different base URL
+        from the rest of this client (api.arena.social vs api.starsarena.com).
+
+        Body requires threadId + userId of the post being replied to.
+        Content is wrapped in <div> tags as Arena renders HTML.
         """
-        data = self._post_req("/threads", {
-            "content":       content,
-            "files":         [],
-            "privacyType":   0,
-            "hasURLPreview": False,
-            "answerId":      thread_id,
-        })
+        self._throttle()
+        url = "https://api.starsarena.com/threads/answer"
+        logger.debug(f"POST threads/answer thread={thread_id[:8]}…")
+        r = self.session.post(url, json={
+            "content":  f"<div>{content}</div>",
+            "threadId": thread_id,
+            "userId":   user_id,
+            "files":    [],
+        }, timeout=10)
+        r.raise_for_status()
+        data = r.json()
         thread = data.get("thread", {})
         logger.info(f"Replied | thread={thread_id[:8]}… | id={str(thread.get('id', '?'))[:8]}…")
         return thread

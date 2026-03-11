@@ -140,13 +140,13 @@ def handle_claim(cmd: ParsedCommand, client) -> bool:
             upsert_user(handle, cmd.issuer_arena_id)
             reply = format_claim_success(handle)
 
-        send_reply(client, reply, thread_id=cmd.thread_id)
+        send_reply(client, reply, thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
         return True
 
     except Exception as e:
         logger.error(f"handle_claim failed for @{handle}: {e}", exc_info=True)
         try:
-            send_reply(client, format_error(handle), thread_id=cmd.thread_id)
+            send_reply(client, format_error(handle), thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
         except Exception:
             pass
         return False
@@ -163,13 +163,13 @@ def handle_reveal(cmd: ParsedCommand, client) -> bool:
     logger.info(f"handle_reveal: @{handle}")
 
     try:
-        send_reply(client, f"@{handle} — scoring in progress, give me a moment ⏳", thread_id=cmd.thread_id)
+        send_reply(client, f"@{handle} — scoring in progress, give me a moment ⏳", thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
         snapshot, epoch_id, cached = _get_or_score(handle)
 
         if snapshot is None:
             # Scoring failed — likely insufficient posts
             reply = format_reveal_insufficient(handle, 0, 0)
-            send_reply(client, reply, thread_id=cmd.thread_id)
+            send_reply(client, reply, thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
             return True
 
         # Check for insufficient posts error in snapshot
@@ -178,7 +178,7 @@ def handle_reveal(cmd: ParsedCommand, client) -> bool:
         active = breakdown.get("active", 0)
         if total < 5 or active < 1:
             reply = format_reveal_insufficient(handle, total, active)
-            send_reply(client, reply, thread_id=cmd.thread_id)
+            send_reply(client, reply, thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
             return True
 
         # Get epoch and anchor status
@@ -194,13 +194,13 @@ def handle_reveal(cmd: ParsedCommand, client) -> bool:
             snapshot["epoch"]["end"] = epoch_end
 
         reply = format_reveal(handle, snapshot, epoch, sealed)
-        send_reply(client, reply, thread_id=cmd.thread_id)
+        send_reply(client, reply, thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
         return True
 
     except Exception as e:
         logger.error(f"handle_reveal failed for @{handle}: {e}", exc_info=True)
         try:
-            send_reply(client, format_error(handle), thread_id=cmd.thread_id)
+            send_reply(client, format_error(handle), thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
         except Exception:
             pass
         return False
@@ -218,7 +218,7 @@ def handle_inspect(cmd: ParsedCommand, client) -> bool:
     target = cmd.target_handle
 
     if not target:
-        send_reply(client, format_inspect_missing_target(issuer), thread_id=cmd.thread_id)
+        send_reply(client, format_inspect_missing_target(issuer), thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
         return True
 
     logger.info(f"handle_inspect: @{issuer} → @{target}")
@@ -236,7 +236,7 @@ def handle_inspect(cmd: ParsedCommand, client) -> bool:
                     scores_row["snapshot_json"],
                     anchor or {},
                 )
-                send_reply(client, reply, thread_id=cmd.thread_id)
+                send_reply(client, reply, thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
                 return True
 
         # No sealed record — run scoring for a live preview
@@ -244,7 +244,7 @@ def handle_inspect(cmd: ParsedCommand, client) -> bool:
 
         if snapshot is None:
             reply = format_inspect_insufficient(issuer, target, 0, 0)
-            send_reply(client, reply, thread_id=cmd.thread_id)
+            send_reply(client, reply, thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
             return True
 
         breakdown = snapshot.get("post_breakdown", {})
@@ -252,17 +252,17 @@ def handle_inspect(cmd: ParsedCommand, client) -> bool:
         active = breakdown.get("active", 0)
         if total < 5 or active < 1:
             reply = format_inspect_insufficient(issuer, target, total, active)
-            send_reply(client, reply, thread_id=cmd.thread_id)
+            send_reply(client, reply, thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
             return True
 
         reply = format_inspect_unsealed(issuer, target, snapshot)
-        send_reply(client, reply, thread_id=cmd.thread_id)
+        send_reply(client, reply, thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
         return True
 
     except Exception as e:
         logger.error(f"handle_inspect failed: @{issuer} → @{target}: {e}", exc_info=True)
         try:
-            send_reply(client, format_error(issuer), thread_id=cmd.thread_id)
+            send_reply(client, format_error(issuer), thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
         except Exception:
             pass
         return False
@@ -271,7 +271,7 @@ def handle_inspect(cmd: ParsedCommand, client) -> bool:
 def handle_unknown_command(cmd: ParsedCommand, client) -> bool:
     """Reply with available commands list."""
     try:
-        send_reply(client, format_unknown_command(cmd.issuer_handle, cmd.raw_content), thread_id=cmd.thread_id)
+        send_reply(client, format_unknown_command(cmd.issuer_handle, cmd.raw_content), thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
         return True
     except Exception as e:
         logger.error(f"handle_unknown_command failed: {e}")
