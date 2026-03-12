@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- 3x3 grid, tile 34px, gap 9px -->
+  <rect x="0"  y="0"  width="34" height="34" fill="#1E1E22" rx="3"/>
+  <rect x="43" y="0"  width="34" height="34" fill="#1E1E22" rx="3"/>
+  <rect x="86" y="0"  width="34" height="34" fill="#1E1E22" rx="3"/>
+  <rect x="0"  y="43" width="34" height="34" fill="#1E1E22" rx="3"/>
+  <rect x="43" y="43" width="34" height="34" fill="#E8FF47" rx="3"/>
+  <rect x="86" y="43" width="34" height="34" fill="#1E1E22" rx="3"/>
+  <rect x="0"  y="86" width="34" height="34" fill="#1E1E22" rx="3"/>
+  <rect x="43" y="86" width="34" height="34" fill="#1E1E22" rx="3"/>
+  <rect x="86" y="86" width="34" height="34" fill="#1E1E22" rx="3"/>
+</svg>
