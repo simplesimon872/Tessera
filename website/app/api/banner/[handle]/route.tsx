@@ -84,13 +84,13 @@ export async function GET(
         <div style={{ display: 'flex', flexDirection: 'row', flex: 1, paddingLeft: 52, paddingRight: 52, paddingTop: 28, paddingBottom: 28 }}>
 
           {/* Composite */}
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginRight: 64, paddingRight: 64, borderRight: '1px solid #1E1E22' }}>
-            <div style={{ display: 'flex', color: '#888890', fontSize: 11, letterSpacing: 3 }}>COMPOSITE</div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', marginRight: 64, paddingRight: 64, borderRight: '1px solid #1E1E22' }}>
+            <div style={{ display: 'flex', color: '#888890', fontSize: 11, letterSpacing: 3, marginBottom: 10 }}>COMPOSITE</div>
             <div style={{ display: 'flex', color: scoreColour, fontSize: 100, fontWeight: 700, lineHeight: 1 }}>{composite}</div>
           </div>
 
           {/* Four pillars */}
-          <div style={{ display: 'flex', flexDirection: 'row', flex: 1, alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', flex: 1, alignItems: 'flex-start', paddingTop: 8 }}>
 
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
               <div style={{ display: 'flex', color: '#888890', fontSize: 10, letterSpacing: 2, marginBottom: 10 }}>ORIGINALITY</div>
