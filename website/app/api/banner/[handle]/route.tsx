@@ -65,7 +65,7 @@ export async function GET(
 
           {/* Left — wordmark + handle */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', color: '#888890', fontSize: 11, letterSpacing: 3, marginBottom: 12 }}>TESSERA PROTOCOL</div>
+            <div style={{ display: 'flex', color: '#888890', fontSize: 16, letterSpacing: 3, marginBottom: 12 }}>TESSERA PROTOCOL</div>
             <div style={{ display: 'flex', color: '#F0F0F0', fontSize: 72, fontWeight: 700, lineHeight: 1 }}>@{cleanHandle}</div>
           </div>
 
@@ -90,7 +90,7 @@ export async function GET(
           </div>
 
           {/* Four pillars */}
-          <div style={{ display: 'flex', flexDirection: 'row', flex: 1, alignItems: 'flex-start', paddingTop: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'row', flex: 1, alignSelf: 'center' }}>
 
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
               <div style={{ display: 'flex', color: '#888890', fontSize: 10, letterSpacing: 2, marginBottom: 10 }}>ORIGINALITY</div>
