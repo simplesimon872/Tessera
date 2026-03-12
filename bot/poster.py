@@ -146,7 +146,7 @@ def format_inspect_unsealed(issuer, target, snapshot):
         f"Consistency   {consistency}\n"
         f"Depth         {depth}\n\n"
         f"Full record: <a href=\"{profile_url}\">{profile_url}</a>\n\n"
-        f"@{target} — reply 'claim' to start sealing your record."
+        f"@{target} — to seal your record, post: @bannerusmaximus claim"
     )
 
 
@@ -170,11 +170,10 @@ def format_rate_limited(handle, count):
 def format_unknown_command(handle, raw):
     return (
         f"@{handle} — didn't recognise that command.\n\n"
-        f"Available commands:\n"
-        f"  claim\n"
-        f"  reveal\n"
-        f"  inspect @handle\n\n"
-        f"Reply with the command word to use it."
+        f"Post one of these to use Tessera:\n"
+        f"  @bannerusmaximus claim\n"
+        f"  @bannerusmaximus reveal\n"
+        f"  @bannerusmaximus inspect @handle"
     )
 
 

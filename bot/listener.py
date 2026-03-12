@@ -136,7 +136,7 @@ def run():
                 title = notification.get("title", "")
                 ntype = notification.get("type", "?")
 
-                if "mentioned you in a thread" in title:
+                if "mentioned you in a thread" in title or "mentioned you in a comment" in title or title.endswith("replied:"):
                     logger.info(f"  ✉ [{ntype}] {notification_id[:8]}… | {title[:60]}")
 
                 # Idempotency guard
@@ -145,16 +145,22 @@ def run():
                     last_notification_id = notification_id
                     continue
 
-                # Only care about mentions
-                from bot.parser import is_mention
-                if not is_mention(notification):
-                    logger.debug(f"    Not a mention (type={ntype}) — skipping")
+                # Only care about mentions and direct replies to the bot
+                from bot.parser import is_mention, is_reply_to_bot
+                is_a_mention = is_mention(notification)
+                is_a_reply   = is_reply_to_bot(notification)
+
+                if not is_a_mention and not is_a_reply:
+                    logger.debug(f"    Not a mention or reply (type={ntype}) — skipping")
                     set_bot_state(dedup_key, "1")
                     last_notification_id = notification_id
                     set_bot_state("last_processed_notification_id", notification_id)
                     continue
 
-                logger.info(f"    ✉ MENTION detected — fetching thread…")
+                if is_a_mention:
+                    logger.info(f"    ✉ MENTION detected — fetching thread…")
+                else:
+                    logger.info(f"    ↩ REPLY detected — fetching thread…")
 
                 # Parse
                 try:
@@ -169,7 +175,13 @@ def run():
                     logger.info(f"    Thread ID: {thread_id}")
                     thread = client.get_thread(thread_id)
                     logger.info(f"    Thread content: {thread.get('content', '')[:80]}")
-                    result = parse_notification(notification, thread, bot_start_ms)
+
+                    # Use correct parser based on notification type
+                    if is_a_mention:
+                        result = parse_notification(notification, thread, bot_start_ms)
+                    else:
+                        from bot.parser import parse_reply_notification
+                        result = parse_reply_notification(notification, thread, bot_start_ms)
 
                 except Exception as e:
                     logger.warning(f"    Parse error: {e}")
