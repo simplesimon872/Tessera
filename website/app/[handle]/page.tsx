@@ -10,9 +10,21 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps) {
   const { handle } = await params
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tessera-8x7.pages.dev'
   return {
     title: `@${handle} — Tessera`,
     description: `Behavioral epoch record for @${handle} on Tessera.`,
+    openGraph: {
+      title: `@${handle} — Tessera`,
+      description: `Behavioral epoch record for @${handle} on Tessera.`,
+      images: [`${siteUrl}/api/banner/${handle}`],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `@${handle} — Tessera`,
+      description: `Behavioral epoch record for @${handle} on Tessera.`,
+      images: [`${siteUrl}/api/banner/${handle}`],
+    },
   }
 }
 
@@ -117,7 +129,7 @@ export default async function ProfilePage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Audit link */}
+          {/* Audit link + banner download */}
           <div className="fade-in fade-in-3 mb-12">
             <Link
               href={`/audit/${latestEpoch.id}`}
@@ -126,6 +138,14 @@ export default async function ProfilePage({ params }: PageProps) {
               <span>VIEW FULL AUDIT TRAIL</span>
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </Link>
+            <a
+              href={`/api/banner/${handle}`}
+              download={`tessera-${handle}.png`}
+              className="w-full flex items-center justify-between border-b border-border py-4 text-muted hover:text-accent font-mono text-xs tracking-wide group transition-colors"
+            >
+              <span>DOWNLOAD X BANNER</span>
+              <span className="group-hover:translate-x-1 transition-transform">↓</span>
+            </a>
           </div>
         </>
       ) : (
