@@ -1,10 +1,18 @@
 /**
  * GET /api/banner/[handle]
  *
- * Returns a 1500x500 SVG banner — X/Twitter header size.
- * SVG approach used instead of ImageResponse (not supported on this Cloudflare edge build).
- * Renders correctly in browsers and as OG preview images.
+ * Returns a 1500x500 PNG banner using ImageResponse.
+ * X/Twitter header size. Also used as OG image for profile pages.
+ *
+ * ImageResponse JSX rules (Satori under the hood):
+ *  - All elements need display:flex explicitly
+ *  - No shorthand CSS (no gap, no border shorthand)
+ *  - No CSS gradients on pseudo-elements
+ *  - position:absolute requires parent to have position:relative
+ *  - No overflow on children
  */
+
+import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
 
@@ -25,33 +33,23 @@ function fmtDate(iso: string): string {
   }
 }
 
-function esc(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-}
-
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ handle: string }> },
 ) {
   const { handle } = await params
-  const cleanHandle = esc(handle.toLowerCase().replace(/^@/, ''))
+  const cleanHandle = handle.toLowerCase().replace(/^@/, '')
 
   // Fetch profile
   let profile: any = null
   try {
-    const res = await fetch(`${API_URL}/api/score/${cleanHandle}`, {
-      headers: { 'Accept': 'application/json' },
-    })
+    const res = await fetch(`${API_URL}/api/score/${cleanHandle}`)
     if (res.ok) {
       const json = await res.json()
       profile = json.ok ? json.data : null
     }
   } catch {
-    // no-data banner
+    // render no-data banner
   }
 
   const epoch     = profile?.epochs?.[0] ?? null
@@ -70,96 +68,280 @@ export async function GET(
   const epochEnd   = epoch?.epoch_end   ? fmtDate(epoch.epoch_end)   : null
   const dateLine   = epochStart && epochEnd ? `${epochStart} to ${epochEnd}` : ''
 
-  const txShort    = anchor?.tx_hash ? esc((anchor.tx_hash as string).slice(0, 14) + '...') : ''
+  const txShort      = anchor?.tx_hash ? (anchor.tx_hash as string).slice(0, 14) + '...' : ''
   const statusLabel  = isSealed ? 'SEALED' : hasClaim ? 'LIVE' : 'UNSEALED'
   const statusColour = isSealed ? '#4AFF91' : '#E8FF47'
   const chainLabel   = isSealed ? 'AVALANCHE C-CHAIN MAINNET' : 'PENDING SEAL'
   const dotColour    = isSealed ? '#4AFF91' : '#1E1E22'
 
   const pillars = [
-    { label: 'ORIG',  value: originality, x: 620 },
-    { label: 'FOCUS', value: focus,       x: 790 },
-    { label: 'CONS',  value: consistency, x: 960 },
-    { label: 'DEPTH', value: depth,       x: 1130 },
+    { label: 'ORIG',  value: originality },
+    { label: 'FOCUS', value: focus       },
+    { label: 'CONS',  value: consistency },
+    { label: 'DEPTH', value: depth       },
   ]
 
-  // Stripe pattern IDs need to be unique per request to avoid SVG caching issues
-  const patternId = `stripes-${cleanHandle}`
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width:          1500,
+          height:         500,
+          backgroundColor: '#0A0A0B',
+          display:        'flex',
+          flexDirection:  'row',
+          position:       'relative',
+        }}
+      >
+        {/* Left accent bar */}
+        <div style={{
+          position:        'absolute',
+          left:            0,
+          top:             0,
+          width:           6,
+          height:          500,
+          backgroundColor: statusColour,
+          display:         'flex',
+        }} />
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="500" viewBox="0 0 1500 500">
-  <defs>
-    <pattern id="${patternId}" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
-      <rect width="40" height="40" fill="#0A0A0B"/>
-      <line x1="20" y1="0" x2="20" y2="40" stroke="#1A1A1E" stroke-width="1"/>
-    </pattern>
-  </defs>
+        {/* Horizontal hairline */}
+        <div style={{
+          position:        'absolute',
+          left:            6,
+          top:             249,
+          width:           1494,
+          height:          1,
+          backgroundColor: '#1E1E22',
+          display:         'flex',
+        }} />
 
-  <!-- Background -->
-  <rect width="1500" height="500" fill="#0A0A0B"/>
+        {/* Vertical panel divider */}
+        <div style={{
+          position:        'absolute',
+          left:            566,
+          top:             40,
+          width:           1,
+          height:          420,
+          backgroundColor: '#1E1E22',
+          display:         'flex',
+        }} />
 
-  <!-- Diagonal stripe decoration top-right -->
-  <rect x="1020" y="-60" width="540" height="620" fill="url(#${patternId})" opacity="0.8"/>
+        {/* Stripe decoration — top right, using stacked divs */}
+        {[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14].map((i) => (
+          <div
+            key={i}
+            style={{
+              position:        'absolute',
+              right:           -20 + (i * 30),
+              top:             -20,
+              width:           1,
+              height:          580,
+              backgroundColor: '#1A1A1E',
+              transform:       'rotate(45deg)',
+              display:         'flex',
+            }}
+          />
+        ))}
 
-  <!-- Left accent bar -->
-  <rect x="0" y="0" width="6" height="500" fill="${statusColour}"/>
+        {/* ── LEFT PANEL ── */}
+        <div style={{
+          display:        'flex',
+          flexDirection:  'column',
+          justifyContent: 'space-between',
+          paddingTop:     44,
+          paddingBottom:  44,
+          paddingLeft:    52,
+          paddingRight:   48,
+          width:          560,
+        }}>
 
-  <!-- Horizontal hairline -->
-  <line x1="6" y1="250" x2="1500" y2="250" stroke="#1E1E22" stroke-width="1"/>
+          {/* Top */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
 
-  <!-- Vertical divider between panels -->
-  <line x1="566" y1="40" x2="566" y2="460" stroke="#1E1E22" stroke-width="1"/>
+            <div style={{
+              fontSize:      11,
+              color:         '#888890',
+              letterSpacing: '3px',
+              fontFamily:    'sans-serif',
+              marginBottom:  16,
+            }}>
+              TESSERA PROTOCOL
+            </div>
 
-  <!-- ── LEFT PANEL ── -->
+            <div style={{
+              fontSize:      64,
+              fontWeight:    700,
+              color:         '#F0F0F0',
+              lineHeight:    1,
+              letterSpacing: '-1px',
+              fontFamily:    'sans-serif',
+              marginBottom:  20,
+            }}>
+              @{cleanHandle}
+            </div>
 
-  <!-- TESSERA PROTOCOL label -->
-  <text x="52" y="88" font-family="system-ui, sans-serif" font-size="11" fill="#888890" letter-spacing="3">TESSERA PROTOCOL</text>
+            {/* Status pill */}
+            <div style={{
+              display:         'flex',
+              flexDirection:   'row',
+              alignItems:      'center',
+            }}>
+              <div style={{
+                display:         'flex',
+                fontSize:        11,
+                color:           statusColour,
+                letterSpacing:   '2px',
+                border:          `1px solid ${statusColour}50`,
+                backgroundColor: `${statusColour}15`,
+                paddingTop:      4,
+                paddingBottom:   4,
+                paddingLeft:     12,
+                paddingRight:    12,
+                fontFamily:      'sans-serif',
+                marginRight:     12,
+              }}>
+                {statusLabel}
+              </div>
+              {txShort && (
+                <div style={{
+                  display:    'flex',
+                  fontSize:   10,
+                  color:      '#888890',
+                  fontFamily: 'sans-serif',
+                }}>
+                  TX {txShort}
+                </div>
+              )}
+            </div>
+          </div>
 
-  <!-- Handle -->
-  <text x="52" y="180" font-family="system-ui, sans-serif" font-size="72" font-weight="700" fill="#F0F0F0" letter-spacing="-1">@${cleanHandle}</text>
+          {/* Bottom */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {dateLine && (
+              <div style={{
+                fontSize:      11,
+                color:         '#888890',
+                letterSpacing: '1px',
+                fontFamily:    'sans-serif',
+                marginBottom:  8,
+              }}>
+                {dateLine}
+              </div>
+            )}
+            <div style={{
+              fontSize:      11,
+              color:         '#2A2A2E',
+              letterSpacing: '1px',
+              fontFamily:    'sans-serif',
+            }}>
+              tessera-8x7.pages.dev
+            </div>
+          </div>
+        </div>
 
-  <!-- Status pill -->
-  <rect x="52" y="200" width="${statusLabel.length * 9 + 24}" height="28" fill="${statusColour}15" stroke="${statusColour}50" stroke-width="1" rx="1"/>
-  <text x="64" y="219" font-family="system-ui, sans-serif" font-size="11" font-weight="500" fill="${statusColour}" letter-spacing="2">${statusLabel}</text>
+        {/* ── RIGHT PANEL ── */}
+        <div style={{
+          display:        'flex',
+          flexDirection:  'column',
+          justifyContent: 'space-between',
+          paddingTop:     44,
+          paddingBottom:  44,
+          paddingLeft:    52,
+          paddingRight:   60,
+          flex:           1,
+        }}>
 
-  ${txShort ? `<text x="${52 + statusLabel.length * 9 + 40}" y="219" font-family="system-ui, sans-serif" font-size="10" fill="#888890" letter-spacing="1">TX ${txShort}</text>` : ''}
+          {/* Composite */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{
+              fontSize:      11,
+              color:         '#888890',
+              letterSpacing: '3px',
+              fontFamily:    'sans-serif',
+              marginBottom:  8,
+            }}>
+              COMPOSITE SCORE
+            </div>
+            <div style={{
+              fontSize:      148,
+              fontWeight:    700,
+              color:         composite !== '--' ? '#E8FF47' : '#1E1E22',
+              lineHeight:    1,
+              letterSpacing: '-4px',
+              fontFamily:    'sans-serif',
+            }}>
+              {composite}
+            </div>
+          </div>
 
-  <!-- Epoch dates -->
-  ${dateLine ? `<text x="52" y="408" font-family="system-ui, sans-serif" font-size="11" fill="#888890" letter-spacing="1">${esc(dateLine)}</text>` : ''}
+          {/* Four pillars */}
+          <div style={{
+            display:       'flex',
+            flexDirection: 'row',
+          }}>
+            {pillars.map(({ label, value }, i) => (
+              <div
+                key={label}
+                style={{
+                  display:         'flex',
+                  flexDirection:   'column',
+                  flex:            1,
+                  borderLeft:      i > 0 ? '1px solid #1E1E22' : 'none',
+                  paddingLeft:     i > 0 ? 24 : 0,
+                }}
+              >
+                <div style={{
+                  fontSize:      10,
+                  color:         '#888890',
+                  letterSpacing: '2px',
+                  fontFamily:    'sans-serif',
+                  marginBottom:  8,
+                }}>
+                  {label}
+                </div>
+                <div style={{
+                  fontSize:      44,
+                  fontWeight:    700,
+                  color:         value === '--' ? '#1E1E22' : '#F0F0F0',
+                  letterSpacing: '-1px',
+                  lineHeight:    1,
+                  fontFamily:    'sans-serif',
+                }}>
+                  {value}
+                </div>
+              </div>
+            ))}
+          </div>
 
-  <!-- Site URL -->
-  <text x="52" y="430" font-family="system-ui, sans-serif" font-size="11" fill="#2A2A2E" letter-spacing="1">tessera-8x7.pages.dev</text>
+          {/* Chain indicator */}
+          <div style={{
+            display:    'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+            <div style={{
+              width:           8,
+              height:          8,
+              borderRadius:    4,
+              backgroundColor: dotColour,
+              marginRight:     8,
+            }} />
+            <div style={{
+              fontSize:      10,
+              color:         '#888890',
+              letterSpacing: '2px',
+              fontFamily:    'sans-serif',
+            }}>
+              {chainLabel}
+            </div>
+          </div>
 
-  <!-- ── RIGHT PANEL ── -->
-
-  <!-- COMPOSITE SCORE label -->
-  <text x="614" y="88" font-family="system-ui, sans-serif" font-size="11" fill="#888890" letter-spacing="3">COMPOSITE SCORE</text>
-
-  <!-- Composite number -->
-  <text x="610" y="230" font-family="system-ui, sans-serif" font-size="148" font-weight="700" fill="${composite !== '--' ? '#E8FF47' : '#1E1E22'}" letter-spacing="-4">${composite}</text>
-
-  <!-- Pillar dividers -->
-  <line x1="790" y1="310" x2="790" y2="450" stroke="#1E1E22" stroke-width="1"/>
-  <line x1="960" y1="310" x2="960" y2="450" stroke="#1E1E22" stroke-width="1"/>
-  <line x1="1130" y1="310" x2="1130" y2="450" stroke="#1E1E22" stroke-width="1"/>
-
-  <!-- Pillars -->
-  ${pillars.map(({ label, value, x }) => `
-  <text x="${x}" y="336" font-family="system-ui, sans-serif" font-size="10" fill="#888890" letter-spacing="2">${label}</text>
-  <text x="${x}" y="390" font-family="system-ui, sans-serif" font-size="44" font-weight="700" fill="${value === '--' ? '#1E1E22' : '#F0F0F0'}" letter-spacing="-1">${value}</text>
-  `).join('')}
-
-  <!-- Chain indicator dot -->
-  <circle cx="618" cy="463" r="4" fill="${dotColour}"/>
-  <text x="630" y="467" font-family="system-ui, sans-serif" font-size="10" fill="#888890" letter-spacing="2">${chainLabel}</text>
-
-</svg>`
-
-  return new Response(svg, {
-    headers: {
-      'Content-Type':  'image/svg+xml',
-      'Cache-Control': isSealed
-        ? 'public, max-age=86400, stale-while-revalidate=3600'
-        : 'public, max-age=300, stale-while-revalidate=60',
+        </div>
+      </div>
+    ),
+    {
+      width:  1500,
+      height: 500,
     },
-  })
+  )
 }
