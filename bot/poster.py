@@ -106,6 +106,7 @@ def format_inspect_sealed(issuer, target, snapshot, anchor):
     depth       = _fmt(scores.get("depth"))
 
     tx = anchor.get("tx_hash", "")[:18] + "…" if anchor.get("tx_hash") else "—"
+    profile_url = f"https://tessera-8x7.pages.dev/{target}"
 
     return (
         f"@{issuer} — here's @{target}'s latest sealed record\n\n"
@@ -115,7 +116,8 @@ def format_inspect_sealed(issuer, target, snapshot, anchor):
         f"Focus         {focus}\n"
         f"Consistency   {consistency}\n"
         f"Depth         {depth}\n\n"
-        f"Sealed onchain ✅  TX: {tx}"
+        f"Sealed onchain ✅  TX: {tx}\n\n"
+        f"Full record: <a href=\"{profile_url}\">{profile_url}</a>"
     )
 
 
@@ -132,6 +134,8 @@ def format_inspect_unsealed(issuer, target, snapshot):
     consistency = _fmt(scores.get("consistency"))
     depth       = _fmt(scores.get("depth"))
 
+    profile_url = f"https://tessera-8x7.pages.dev/{target}"
+
     return (
         f"@{issuer} — @{target} has no sealed record yet. "
         f"Here's what their epoch looks like right now:\n\n"
@@ -141,8 +145,8 @@ def format_inspect_unsealed(issuer, target, snapshot):
         f"Focus         {focus}\n"
         f"Consistency   {consistency}\n"
         f"Depth         {depth}\n\n"
-        f"Profile: tessera-8x7.pages.dev/{target}\n\n"
-        f"@{target} — tag @bannerusmaximus claim to start sealing your record."
+        f"Full record: <a href=\"{profile_url}\">{profile_url}</a>\n\n"
+        f"@{target} — reply 'claim' to start sealing your record."
     )
 
 
@@ -167,9 +171,10 @@ def format_unknown_command(handle, raw):
     return (
         f"@{handle} — didn't recognise that command.\n\n"
         f"Available commands:\n"
-        f"  @bannerusmaximus claim\n"
-        f"  @bannerusmaximus reveal\n"
-        f"  @bannerusmaximus inspect @handle"
+        f"  claim\n"
+        f"  reveal\n"
+        f"  inspect @handle\n\n"
+        f"Reply with the command word to use it."
     )
 
 
