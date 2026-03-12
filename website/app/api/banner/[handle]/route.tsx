@@ -1,5 +1,5 @@
 /**
- * Step 4 - two columns, no borders, no borderRadius, no flex:1, no lineHeight
+ * Step 5 - use background not backgroundColor, match working minimal exactly then expand
  */
 
 import { ImageResponse } from 'next/og'
@@ -15,7 +15,7 @@ export async function GET(
 
   return new ImageResponse(
     (
-      <div style={{ width: 1500, height: 500, backgroundColor: '#0A0A0B', display: 'flex', flexDirection: 'row' }}>
+      <div style={{ width: 1500, height: 500, background: '#0A0A0B', display: 'flex', flexDirection: 'row' }}>
 
         <div style={{ display: 'flex', flexDirection: 'column', width: 560, paddingTop: 44, paddingLeft: 52 }}>
           <div style={{ fontSize: 11, color: '#888890', fontFamily: 'sans-serif' }}>TESSERA PROTOCOL</div>
