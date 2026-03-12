@@ -309,7 +309,7 @@ All commands are issued by mentioning `@bannerusmaximus` in an Arena post.
 |---|---|---|
 | `claim` | `@bannerusmaximus claim` | Registers your account, confirms activation |
 | `reveal` | `@bannerusmaximus reveal` | Scores your current epoch, returns results |
-| `inspect` | `@bannerusmaximus inspect @handle` | Shows another user's latest epoch |
+| `inspect` | `@bannerusmaximus inspect @handle` | Scores any Arena account — claimed or not. Saves their record to the DB automatically. Unclaimed accounts get a profile page and are prompted to claim. |
 
 ### Rate Limits
 - 5 commands per user per hour
@@ -421,6 +421,7 @@ Once written, attestations are immutable. The contract contains no administrativ
 
 ## User Journey
 
+**Path A — Claim first**
 1. User discovers Tessera on Arena or via `@bannerusmaximus`
 2. Posts `@bannerusmaximus claim` → receives activation confirmation
 3. Bot registers the account in Supabase
@@ -429,11 +430,19 @@ Once written, attestations are immutable. The contract contains no administrativ
 6. Fetcher pulls 30 days of posts from Arena API
 7. Classifier processes each post with Claude Haiku
 8. Engine computes all four dimension scores
-9. Bot posts the full score breakdown to Arena (unsealed)
+9. Bot posts the full score breakdown to Arena (unsealed) as a reply in the triggering thread
 10. At epoch boundary (Sunday midnight UTC), cron job seals the snapshot onchain
 11. TX hash is stored in Supabase and can be verified on Snowtrace
 12. Profile is visible at `tessera-8x7.pages.dev/@handle`
-13. User can inspect any other registered user with `@bannerusmaximus inspect @handle`
+
+**Path B — Inspected first (no claim required)**
+1. Any user runs `@bannerusmaximus inspect @handle` on any Arena account
+2. Bot scores the target account and saves the epoch to the DB automatically
+3. Target account's profile page goes live immediately at `tessera-8x7.pages.dev/@handle`
+4. Target appears on the leaderboard as UNSEALED
+5. Bot reply tags the target account and prompts them to claim
+6. When target claims, the cron begins sealing their epochs going forward
+7. Historical computed epochs remain in their profile — history is never lost
 
 ---
 

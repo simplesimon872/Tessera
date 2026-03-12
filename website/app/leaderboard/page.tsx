@@ -23,8 +23,9 @@ export default async function LeaderboardPage() {
           Leaderboard
         </h1>
         <p className="font-sans text-muted text-sm max-w-lg">
-          Ranked by composite score across the most recent sealed epoch.
-          All scores are deterministic and onchain-verified.
+          Ranked by composite score across the most recent epoch.
+          Sealed epochs are permanently anchored on Avalanche C-Chain.
+          Unsealed accounts are scored but not yet onchain — tag @bannerusmaximus claim to seal your record.
         </p>
       </div>
 
@@ -53,8 +54,10 @@ export default async function LeaderboardPage() {
                     <p className="font-sans font-bold text-sm group-hover:text-accent transition-colors">
                       @{entry.handle}
                     </p>
-                    {entry.status === 'sealed' && (
-                      <p className="font-mono text-xs text-sealed mt-2">SEALED</p>
+                    {entry.status === 'sealed' ? (
+                      <p className="font-mono text-xs text-sealed mt-2">SEALED ✓</p>
+                    ) : (
+                      <p className="font-mono text-xs text-muted mt-2">UNSEALED</p>
                     )}
                   </Link>
                 )
@@ -116,6 +119,8 @@ export default async function LeaderboardPage() {
         <p className="font-mono text-xs text-muted leading-relaxed max-w-xl">
           Scores are computed over 30-day epochs using a deterministic engine and frozen
           classification prompt (v5). Sealed epochs are permanently anchored on Avalanche C-Chain.
+          Unsealed records are computed and saved but not yet onchain — they accumulate across
+          epochs until the account claims and sealing begins.
         </p>
       </div>
 

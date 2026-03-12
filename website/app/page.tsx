@@ -83,7 +83,7 @@ export default async function HomePage() {
             {
               command: '@bannerusmaximus inspect @handle',
               label: 'INSPECT',
-              desc: "View another account's latest epoch scores. Works on any registered Tessera user.",
+              desc: "Score any Arena account — claimed or not. Their record is saved and their profile goes live automatically. Unclaimed accounts can claim to start sealing.",
             },
           ].map(({ command, label, desc }) => (
             <div key={label} className="bg-surface border-b border-border p-6 flex flex-col sm:flex-row sm:items-center gap-4">
