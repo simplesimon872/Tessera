@@ -134,14 +134,15 @@ def format_inspect_unsealed(issuer, target, snapshot):
 
     return (
         f"@{issuer} — @{target} has no sealed record yet. "
-        f"Here's what their epoch looks like unsealed:\n\n"
+        f"Here's what their epoch looks like right now:\n\n"
         f"Epoch {epoch_start} → {epoch_end}\n\n"
         f"Composite     {composite}\n"
         f"Originality   {originality}\n"
         f"Focus         {focus}\n"
         f"Consistency   {consistency}\n"
         f"Depth         {depth}\n\n"
-        f"@{target} — tag @bannerusmaximus claim to seal your record."
+        f"Profile: tessera-8x7.pages.dev/{target}\n\n"
+        f"@{target} — tag @bannerusmaximus claim to start sealing your record."
     )
 
 

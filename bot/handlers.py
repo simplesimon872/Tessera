@@ -83,11 +83,18 @@ def _run_scoring_sync(handle: str) -> Optional[dict]:
         return None
 
 
-def _get_or_score(handle: str) -> tuple[Optional[dict], Optional[str], bool]:
+def _get_or_score(handle: str, register: bool = True) -> tuple[Optional[dict], Optional[str], bool]:
     """
     Return (snapshot, epoch_id, cached).
     Checks DB first — runs scoring only if no current epoch exists.
     Stores to DB if freshly scored.
+
+    register=True  → full claim path: upsert_user + update_user_last_epoch
+                     used by handle_claim and handle_reveal
+    register=False → score-only path: saves epoch + scores but does NOT
+                     register the user as claimed. Used by handle_inspect
+                     so inspected accounts appear on the leaderboard as
+                     unsealed without being treated as having claimed.
     """
     epoch_start, epoch_end = _current_epoch_window()
 
@@ -105,11 +112,16 @@ def _get_or_score(handle: str) -> tuple[Optional[dict], Optional[str], bool]:
     if snapshot is None:
         return None, None, False
 
-    # Store to DB
+    # Store epoch + scores regardless of register flag
     epoch = create_epoch(handle, epoch_start, epoch_end)
     store_scores(epoch["id"], snapshot)
-    upsert_user(handle, snapshot.get("arena_user_id", "unknown"))
-    update_user_last_epoch(handle, epoch["id"])
+
+    # Only register as claimed user if explicitly requested
+    if register:
+        upsert_user(handle, snapshot.get("arena_user_id", "unknown"))
+        update_user_last_epoch(handle, epoch["id"])
+    else:
+        logger.info(f"Scored @{handle} via inspect — saved to DB, not registered as claimed")
 
     return snapshot, epoch["id"], False
 
@@ -239,8 +251,10 @@ def handle_inspect(cmd: ParsedCommand, client) -> bool:
                 send_reply(client, reply, thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
                 return True
 
-        # No sealed record — run scoring for a live preview
-        snapshot, epoch_id, cached = _get_or_score(target)
+        # No sealed record — run scoring for a live preview and save to DB
+        # register=False: saves the score (so it appears on leaderboard) but
+        # does NOT register the account as claimed.
+        snapshot, epoch_id, cached = _get_or_score(target, register=False)
 
         if snapshot is None:
             reply = format_inspect_insufficient(issuer, target, 0, 0)
