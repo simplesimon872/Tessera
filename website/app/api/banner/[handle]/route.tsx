@@ -1,5 +1,5 @@
 /**
- * Step 5 - use background not backgroundColor, match working minimal exactly then expand
+ * Step 6 - exact copy of working minimal, then add ONE thing: a second div
  */
 
 import { ImageResponse } from 'next/og'
@@ -15,21 +15,25 @@ export async function GET(
 
   return new ImageResponse(
     (
-      <div style={{ width: 1500, height: 500, background: '#0A0A0B', display: 'flex', flexDirection: 'row' }}>
-
-        <div style={{ display: 'flex', flexDirection: 'column', width: 560, paddingTop: 44, paddingLeft: 52 }}>
-          <div style={{ fontSize: 11, color: '#888890', fontFamily: 'sans-serif' }}>TESSERA PROTOCOL</div>
-          <div style={{ fontSize: 64, fontWeight: 700, color: '#F0F0F0', fontFamily: 'sans-serif', marginTop: 16 }}>@{cleanHandle}</div>
-          <div style={{ fontSize: 11, color: '#E8FF47', fontFamily: 'sans-serif', marginTop: 16 }}>UNSEALED</div>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', width: 940, paddingTop: 44, paddingLeft: 52 }}>
-          <div style={{ fontSize: 11, color: '#888890', fontFamily: 'sans-serif' }}>COMPOSITE SCORE</div>
-          <div style={{ fontSize: 148, fontWeight: 700, color: '#E8FF47', fontFamily: 'sans-serif', marginTop: 8 }}>69.0</div>
-        </div>
-
+      <div
+        style={{
+          width:          1500,
+          height:         500,
+          background:     '#0A0A0B',
+          display:        'flex',
+          alignItems:     'center',
+          justifyContent: 'center',
+          color:          '#E8FF47',
+          fontSize:       80,
+          fontWeight:     700,
+        }}
+      >
+        @{cleanHandle} — 69.0
       </div>
     ),
-    { width: 1500, height: 500 },
+    {
+      width:  1500,
+      height: 500,
+    },
   )
 }
