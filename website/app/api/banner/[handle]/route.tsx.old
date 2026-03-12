@@ -21,7 +21,6 @@ export async function GET(
   const { handle } = await params
   const cleanHandle = handle.toLowerCase().replace(/^@/, '')
 
-  // Fetch real profile data
   let profile: any = null
   try {
     const res = await fetch(`${API_URL}/api/score/${cleanHandle}`)
@@ -29,7 +28,7 @@ export async function GET(
       const json = await res.json()
       profile = json.ok ? json.data : null
     }
-  } catch { /* render no-data banner */ }
+  } catch { /* no-data banner */ }
 
   const epoch     = profile?.epochs?.[0] ?? null
   const scoresRaw = Array.isArray(epoch?.scores) ? epoch.scores[0] : epoch?.scores
@@ -56,63 +55,75 @@ export async function GET(
 
   return new ImageResponse(
     (
-      <div style={{ width: 1500, height: 500, background: '#0A0A0B', display: 'flex', flexDirection: 'row' }}>
+      <div style={{ width: 1500, height: 500, background: '#0A0A0B', display: 'flex', flexDirection: 'column' }}>
 
-        {/* Accent bar */}
-        <div style={{ display: 'flex', width: 6, height: 500, background: statusColour }} />
+        {/* Top accent bar */}
+        <div style={{ display: 'flex', width: 1500, height: 5, background: statusColour }} />
 
-        {/* LEFT PANEL */}
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: 554, paddingTop: 44, paddingBottom: 44, paddingLeft: 46, paddingRight: 48, borderRight: '1px solid #1E1E22' }}>
+        {/* TOP SECTION — handle full width */}
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', paddingTop: 36, paddingLeft: 52, paddingRight: 52, paddingBottom: 24, borderBottom: '1px solid #1E1E22' }}>
+
+          {/* Left — wordmark + handle */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', color: '#888890', fontSize: 11, letterSpacing: 3 }}>TESSERA PROTOCOL</div>
-            <div style={{ display: 'flex', color: '#F0F0F0', fontSize: 60, fontWeight: 700, marginTop: 16 }}>@{cleanHandle}</div>
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
-              <div style={{ display: 'flex', color: statusColour, fontSize: 11, letterSpacing: 2 }}>{statusLabel}</div>
+            <div style={{ display: 'flex', color: '#888890', fontSize: 16, letterSpacing: 3, marginBottom: 12 }}>TESSERA PROTOCOL</div>
+            <div style={{ display: 'flex', color: '#F0F0F0', fontSize: 72, fontWeight: 700, lineHeight: 1 }}>@{cleanHandle}</div>
+          </div>
+
+          {/* Right — status + dates */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+              <div style={{ display: 'flex', color: statusColour, fontSize: 13, letterSpacing: 3, fontWeight: 600 }}>{statusLabel}</div>
               {txShort ? <div style={{ display: 'flex', color: '#888890', fontSize: 10, marginLeft: 16 }}>TX {txShort}</div> : null}
             </div>
+            {dateLine ? <div style={{ display: 'flex', color: '#888890', fontSize: 11 }}>{dateLine}</div> : null}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {dateLine ? <div style={{ display: 'flex', color: '#888890', fontSize: 11, marginBottom: 6 }}>{dateLine}</div> : null}
-            <div style={{ display: 'flex', color: '#2A2A2E', fontSize: 11 }}>tessera-8x7.pages.dev</div>
-          </div>
+
         </div>
 
-        {/* RIGHT PANEL */}
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: 940, paddingTop: 44, paddingBottom: 44, paddingLeft: 52, paddingRight: 60 }}>
+        {/* BOTTOM SECTION — scores full width */}
+        <div style={{ display: 'flex', flexDirection: 'row', flex: 1, paddingLeft: 52, paddingRight: 52, paddingTop: 28, paddingBottom: 28 }}>
 
           {/* Composite */}
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', color: '#888890', fontSize: 11, letterSpacing: 3 }}>COMPOSITE SCORE</div>
-            <div style={{ display: 'flex', color: scoreColour, fontSize: 120, fontWeight: 700, marginTop: 4 }}>{composite}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', marginRight: 64, paddingRight: 64, borderRight: '1px solid #1E1E22' }}>
+            <div style={{ display: 'flex', color: '#888890', fontSize: 11, letterSpacing: 3, marginBottom: 10 }}>COMPOSITE</div>
+            <div style={{ display: 'flex', color: scoreColour, fontSize: 100, fontWeight: 700, lineHeight: 1 }}>{composite}</div>
           </div>
 
-          {/* Pillars */}
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', color: '#888890', fontSize: 10, letterSpacing: 2 }}>ORIG</div>
-              <div style={{ display: 'flex', color: '#F0F0F0', fontSize: 44, fontWeight: 700, marginTop: 8 }}>{originality}</div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 48, paddingLeft: 48, borderLeft: '1px solid #1E1E22' }}>
-              <div style={{ display: 'flex', color: '#888890', fontSize: 10, letterSpacing: 2 }}>FOCUS</div>
-              <div style={{ display: 'flex', color: '#F0F0F0', fontSize: 44, fontWeight: 700, marginTop: 8 }}>{focus}</div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 48, paddingLeft: 48, borderLeft: '1px solid #1E1E22' }}>
-              <div style={{ display: 'flex', color: '#888890', fontSize: 10, letterSpacing: 2 }}>CONS</div>
-              <div style={{ display: 'flex', color: '#F0F0F0', fontSize: 44, fontWeight: 700, marginTop: 8 }}>{consistency}</div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 48, paddingLeft: 48, borderLeft: '1px solid #1E1E22' }}>
-              <div style={{ display: 'flex', color: '#888890', fontSize: 10, letterSpacing: 2 }}>DEPTH</div>
-              <div style={{ display: 'flex', color: '#F0F0F0', fontSize: 44, fontWeight: 700, marginTop: 8 }}>{depth}</div>
-            </div>
-          </div>
+          {/* Four pillars */}
+          <div style={{ display: 'flex', flexDirection: 'row', flex: 1, alignSelf: 'center' }}>
 
-          {/* Chain indicator */}
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <div style={{ width: 8, height: 8, borderRadius: 4, background: dotColour, marginRight: 8 }} />
-            <div style={{ display: 'flex', color: '#888890', fontSize: 10, letterSpacing: 2 }}>{chainLabel}</div>
-          </div>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+              <div style={{ display: 'flex', color: '#888890', fontSize: 10, letterSpacing: 2, marginBottom: 10 }}>ORIGINALITY</div>
+              <div style={{ display: 'flex', color: '#F0F0F0', fontSize: 52, fontWeight: 700 }}>{originality}</div>
+            </div>
 
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, borderLeft: '1px solid #1E1E22', paddingLeft: 40 }}>
+              <div style={{ display: 'flex', color: '#888890', fontSize: 10, letterSpacing: 2, marginBottom: 10 }}>FOCUS</div>
+              <div style={{ display: 'flex', color: '#F0F0F0', fontSize: 52, fontWeight: 700 }}>{focus}</div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, borderLeft: '1px solid #1E1E22', paddingLeft: 40 }}>
+              <div style={{ display: 'flex', color: '#888890', fontSize: 10, letterSpacing: 2, marginBottom: 10 }}>CONSISTENCY</div>
+              <div style={{ display: 'flex', color: '#F0F0F0', fontSize: 52, fontWeight: 700 }}>{consistency}</div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, borderLeft: '1px solid #1E1E22', paddingLeft: 40 }}>
+              <div style={{ display: 'flex', color: '#888890', fontSize: 10, letterSpacing: 2, marginBottom: 10 }}>DEPTH</div>
+              <div style={{ display: 'flex', color: '#F0F0F0', fontSize: 52, fontWeight: 700 }}>{depth}</div>
+            </div>
+
+            {/* Chain indicator pushed to far right */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'flex-end', paddingLeft: 40 }}>
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                <div style={{ width: 8, height: 8, borderRadius: 4, background: dotColour, marginRight: 8 }} />
+                <div style={{ display: 'flex', color: '#888890', fontSize: 10, letterSpacing: 2 }}>{chainLabel}</div>
+              </div>
+              <div style={{ display: 'flex', color: '#2A2A2E', fontSize: 10 }}>tessera-8x7.pages.dev</div>
+            </div>
+
+          </div>
         </div>
+
       </div>
     ),
     { width: 1500, height: 500 },
