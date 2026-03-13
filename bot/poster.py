@@ -146,7 +146,7 @@ def format_inspect_unsealed(issuer, target, snapshot):
         f"Consistency   {consistency}\n"
         f"Depth         {depth}\n\n"
         f"Full record: <a href=\"{profile_url}\">{profile_url}</a>\n\n"
-        f"@{target} — to seal your record, reply to this post with a single word: claim"
+        f"@{target} — to seal your record, reply to this with a single word: claim"
     )
 
 
