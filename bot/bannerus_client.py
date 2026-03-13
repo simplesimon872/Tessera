@@ -196,12 +196,21 @@ class BannerusClient:
                 if not created:
                     continue
 
-                # Older than window — everything from here is too old, stop paging
+                # Pinned posts appear at the TOP of the feed regardless of date.
+                # A pinned post from months ago would incorrectly trigger the
+                # early-stop below. Skip pinned posts entirely — they are not
+                # representative of current epoch behavior anyway.
+                if thread.get("isPinned", False):
+                    logger.debug(f"Skipping pinned post {thread.get('id', '')[:8]}… (date={created[:10]})")
+                    continue
+
+                # Older than window — everything from here is too old, stop paging.
+                # Safe to use as stop signal now that pinned posts are filtered above.
                 if created < epoch_start_str:
                     done = True
                     break
 
-                # Newer than window (future-dated or pinned) — skip
+                # Newer than window — skip
                 if created > epoch_end_str:
                     continue
 

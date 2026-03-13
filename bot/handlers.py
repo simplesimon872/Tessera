@@ -83,7 +83,7 @@ def _run_scoring_sync(handle: str) -> Optional[dict]:
         return None
 
 
-def _get_or_score(handle: str, register: bool = True) -> tuple[Optional[dict], Optional[str], bool]:
+def _get_or_score(handle: str, register: bool = True, force: bool = False) -> tuple[Optional[dict], Optional[str], bool]:
     """
     Return (snapshot, epoch_id, cached).
     Checks DB first — runs scoring only if no current epoch exists.
@@ -98,8 +98,10 @@ def _get_or_score(handle: str, register: bool = True) -> tuple[Optional[dict], O
     """
     epoch_start, epoch_end = _current_epoch_window()
 
-    # Check cache first
-    existing_epoch = get_epoch(handle, epoch_start)
+    # Check cache first (unless force=True)
+    if force:
+        logger.info(f"Force rescore for @{handle} — skipping cache")
+    existing_epoch = None if force else get_epoch(handle, epoch_start)
     if existing_epoch:
         scores_row = get_scores(existing_epoch["id"])
         if scores_row and scores_row.get("snapshot_json"):
@@ -176,7 +178,7 @@ def handle_reveal(cmd: ParsedCommand, client) -> bool:
 
     try:
         send_reply(client, f"@{handle} — scoring in progress, give me a moment ⏳", thread_id=cmd.thread_id, user_id=cmd.issuer_arena_id)
-        snapshot, epoch_id, cached = _get_or_score(handle)
+        snapshot, epoch_id, cached = _get_or_score(handle, force=True)
 
         if snapshot is None:
             # Scoring failed — likely insufficient posts

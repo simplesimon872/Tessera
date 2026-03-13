@@ -45,6 +45,7 @@ BACKOFF_WAIT_S       = 300      # 5 minutes backoff
 SILENCE_ALERT_S      = 300      # alert if no successful poll in 5 min
 RATE_LIMIT_PER_USER  = 5        # max commands per user per hour
 GLOBAL_CAP_PER_MIN   = 30       # max commands across all users per minute
+RATE_LIMIT_EXEMPT    = {"simplesimon872"}  # handles exempt from rate limiting
 
 
 def run():
@@ -204,7 +205,7 @@ def run():
 
                 # ── Rate limit ────────────────────────────────────────────────
                 recent = count_recent_commands(handle, window_minutes=60)
-                if recent >= RATE_LIMIT_PER_USER:
+                if handle.lower() not in RATE_LIMIT_EXEMPT and recent >= RATE_LIMIT_PER_USER:
                     logger.warning(f"    Rate limit: @{handle} ({recent}/hr)")
                     from bot.poster import send_reply, format_rate_limited
                     try:
