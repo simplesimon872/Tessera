@@ -192,11 +192,23 @@ class BannerusClient:
             for thread in threads:
                 created = thread.get("createdDate", "")
 
-                # Skip posts outside window (e.g. pinned posts)
-                if not created or created < epoch_start_str or created > epoch_end_str:
+                # No date — skip but don't stop
+                if not created:
+                    continue
+
+                # Older than window — everything from here is too old, stop paging
+                if created < epoch_start_str:
+                    done = True
+                    break
+
+                # Newer than window (future-dated or pinned) — skip
+                if created > epoch_end_str:
                     continue
 
                 posts.append(_clean_post(thread))
+
+            if done:
+                break
 
             pagination = data.get("pagination", {})
             if not pagination.get("hasNextPage", False):
@@ -204,7 +216,7 @@ class BannerusClient:
 
             page += 1
 
-        logger.info(f"Fetched {len(posts)} posts in epoch window")
+        logger.info(f"Fetched {len(posts)} posts in epoch window | pages={page}")
         return posts
 
 
@@ -214,14 +226,31 @@ def _strip_html(html: str) -> str:
 
 
 def _clean_post(thread: dict) -> dict:
+    """
+    Extract and normalise fields from a thread dict.
+
+    Handles reposts correctly:
+    - For reposts, thread.content is often empty
+    - Real content sits in thread.repost.content (the reposted thread object)
+    - We extract it so the classifier sees actual text, not an empty string
+    - is_quote flag is set so scoring engine knows it's a repost
+    """
+    content = thread.get("content", "") or ""
+    repost_obj = thread.get("repost")
+    is_repost = repost_obj is not None or thread.get("repostId") is not None
+
+    # For reposts with empty main content, pull from nested repost object
+    if is_repost and repost_obj and not _strip_html(content).strip():
+        content = repost_obj.get("content", "") or ""
+
     return {
         "id":               thread.get("id"),
-        "content":          _strip_html(thread.get("content", "")),
-        "content_raw":      thread.get("content", ""),
+        "content":          _strip_html(content),
+        "content_raw":      content,
         "created_at":       thread.get("createdDate"),
         "user_id":          thread.get("userId"),
         "is_reply":         thread.get("answerId") is not None,
         "parent_thread_id": thread.get("answerId"),
-        "is_quote":         thread.get("repostId") is not None,
+        "is_quote":         is_repost,
         "quoted_thread_id": thread.get("repostId"),
     }
