@@ -510,20 +510,17 @@ def score_epoch(
             f"Minimum required: {MIN_POST_THRESHOLD}."
         )
 
-    # ── Step 2: LLM topic classification ────────────────────────────────
-    classifications = {}  # post_id → category
-    for post in classified_posts:
-        post_id = post.get("id") or post.get("postId") or str(id(post))
-        result = classifier.classify(post.get("content", ""))
-        # Classifier may return {"category": "..."} dict or plain string
-        if isinstance(result, dict):
-            category = result.get("category", "Null")
-        else:
-            category = result
-        classifications[post_id] = category
-        logger.debug(f"  {post_id[:8]}… → {category}")
+    # ── Step 2: LLM topic classification (batched) ──────────────────────
+    logger.info(f"Running batch classification on {len(classified_posts)} posts...")
+    classified_with_cats = classifier.classify_batch(classified_posts)
 
-    logger.info(f"Classified {len(classifications)} posts via LLM")
+    classifications = {}  # post_id → category
+    for post in classified_with_cats:
+        post_id = post.get("id") or post.get("postId") or str(id(post))
+        classifications[post_id] = post.get("category", "Null")
+        logger.debug(f"  {str(post_id)[:8]}… → {classifications[post_id]}")
+
+    logger.info(f"Classified {len(classifications)} posts via LLM (batched)")
 
     # ── Step 3: Score four pillars ────────────────────────────────────────
     originality = _score_originality(active_posts, breakdown.active)
