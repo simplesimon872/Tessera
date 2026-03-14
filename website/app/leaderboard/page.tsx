@@ -27,12 +27,12 @@ export default async function LeaderboardPage() {
           Sealed epochs are permanently anchored on Avalanche C-Chain.
           Unsealed accounts are scored but not yet onchain — tag @bannerusmaximus claim to seal your record.
         </p>
-        <div className="flex items-center gap-4 mt-4">
-          <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-6 mt-4">
+          <div className="flex items-center gap-2">
             <span className="font-mono text-xs text-accent">●</span>
             <span className="font-mono text-xs text-muted">Claimed — sealing active</span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <span className="font-mono text-xs text-muted">○</span>
             <span className="font-mono text-xs text-muted">Unclaimed — inspected only</span>
           </div>
@@ -69,11 +69,9 @@ export default async function LeaderboardPage() {
                     ) : (
                       <p className="font-mono text-xs text-muted mt-2">UNSEALED</p>
                     )}
-                    {entry.claimed ? (
-                      <p className="font-mono text-xs text-accent mt-1">CLAIMED</p>
-                    ) : (
-                      <p className="font-mono text-xs text-muted mt-1">UNCLAIMED</p>
-                    )}
+                    <p className={`font-mono text-xs mt-1 ${entry.claimed ? 'text-accent' : 'text-muted'}`}>
+                      {entry.claimed ? 'CLAIMED' : 'UNCLAIMED'}
+                    </p>
                   </Link>
                 )
               })}
@@ -104,15 +102,12 @@ export default async function LeaderboardPage() {
                   <p className="font-mono text-xs text-muted col-span-1">
                     {index + 1}
                   </p>
-                  <div className="col-span-2 flex items-center gap-1.5 min-w-0">
-                    <p className="font-sans font-semibold text-sm group-hover:text-accent transition-colors truncate">
-                      @{entry.handle}
-                    </p>
-                    {entry.claimed
-                      ? <span className="font-mono text-xs text-accent shrink-0" title="Claimed">●</span>
-                      : <span className="font-mono text-xs text-muted shrink-0" title="Not yet claimed">○</span>
-                    }
-                  </div>
+                  <p className="font-sans font-semibold text-sm col-span-2 group-hover:text-accent transition-colors truncate">
+                    @{entry.handle}
+                    <span className={`font-mono text-xs ml-1.5 ${entry.claimed ? 'text-accent' : 'text-muted'}`}>
+                      {entry.claimed ? '●' : '○'}
+                    </span>
+                  </p>
                   <p className="font-mono text-sm text-accent text-right">
                     {formatScore(entry.composite)}
                   </p>
