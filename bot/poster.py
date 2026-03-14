@@ -14,14 +14,16 @@ def _fmt(score):
     return f"{score:.1f}"
 
 
-def _days_until_seal(epoch_end_str):
-    from datetime import datetime, timezone
-    try:
-        end = datetime.fromisoformat(epoch_end_str)
-        now = datetime.now(timezone.utc)
-        return max(0, (end - now).days)
-    except Exception:
-        return 0
+def _days_until_seal(epoch_end_str=None):
+    """Return days until the next Sunday midnight UTC seal run."""
+    from datetime import datetime, timezone, timedelta
+    now = datetime.now(timezone.utc)
+    # weekday(): Monday=0 ... Sunday=6
+    days_ahead = (6 - now.weekday()) % 7
+    if days_ahead == 0:
+        # It's Sunday — if seal hasn't run yet today, 0 days, else 7 days
+        days_ahead = 0 if now.hour < 1 else 7
+    return days_ahead
 
 
 def format_claim_success(handle):
@@ -146,7 +148,7 @@ def format_inspect_unsealed(issuer, target, snapshot):
         f"Consistency   {consistency}\n"
         f"Depth         {depth}\n\n"
         f"Full record: <a href=\"{profile_url}\">{profile_url}</a>\n\n"
-        f"@{target} — to seal your record, reply to this with a single word: claim"
+        f"@{target} — to seal your record, post: @bannerusmaximus claim"
     )
 
 

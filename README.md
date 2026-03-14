@@ -8,11 +8,24 @@
 
 **Onchain behavioral attestation protocol for Arena social accounts.**
 
-Tessera scores your posting behavior over a 30-day epoch — originality, focus, consistency, and depth — then seals the result permanently on the Avalanche blockchain. No edits. No deletions. A tamper-proof record of behavioral activity on Arena, sealed onchain.
+Tessera scores your posting behavior over a 30-day epoch — originality, focus, consistency, depth, and (coming) signal integrity — then seals the result permanently on the Avalanche blockchain. No edits. No deletions. A tamper-proof record of behavioral activity on Arena, sealed onchain.
 
 > Tag `@bannerusmaximus claim` on Arena to activate your record.
 
 🌐 **Live:** [tessera-8x7.pages.dev](https://tessera-8x7.pages.dev)
+
+---
+
+## Methodology Versions
+
+| Version | Status | Changes |
+|---|---|---|
+| v1.0 | Sealed — historic epochs only | 4 pillars, initial release |
+| v1.1 | Current | Scoring fixes (full pagination, pinned post exclusion, repost handling), Signal Integrity tracking activated |
+| v1.2 | Planned | Signal Integrity scoring (CA call accuracy) |
+| v1.3 | Planned | Signal Integrity as 5th pillar in composite (20% weight each) |
+
+Sealed epochs carry their methodology version permanently. A v1.0 sealed epoch is always v1.0 — hashes remain valid forever under that version.
 
 ---
 
@@ -24,7 +37,7 @@ Crypto social platforms are filled with anonymous accounts and short-lived ident
 
 Tessera creates a verifiable behavioral record by analyzing posting patterns across fixed epochs and sealing the resulting scores onchain.
 
-Instead of reputation based on popularity, Tessera measures behavioral signals — originality, focus, consistency, and depth — and produces an immutable attestation for each epoch.
+Instead of reputation based on popularity, Tessera measures behavioral signals — originality, focus, consistency, depth, and signal integrity — and produces an immutable attestation for each epoch.
 
 ---
 
@@ -50,6 +63,8 @@ Instead of reputation based on popularity, Tessera measures behavioral signals �
       Deterministic Scoring Engine
 (Originality • Focus • Consistency • Depth)
                 │
+                ├── CA Detection → signal_calls DB table
+                │
                 ▼
        Snapshot Canonicalization
           (SHA-256 Hashing)
@@ -68,16 +83,25 @@ Instead of reputation based on popularity, Tessera measures behavioral signals �
 
 ---
 
-## Key Properties
+## The Five Pillars
 
-**Deterministic scoring**
-All scoring logic is deterministic. Given the same classified posts, Tessera will always produce the same score output.
+### Pillar 1 — Originality (v1.0+)
+Measures what proportion of your posts are original content vs replies and quote-reposts.
+`score = original_posts / active_posts × 100`
 
-**Verifiable outputs**
-Every epoch snapshot is hashed and anchored onchain, creating a tamper-proof record that can be independently verified.
+### Pillar 2 — Focus (v1.0+)
+Measures how concentrated your posting is in a single topic area, using Shannon entropy across 6 topic categories (Market & Price, Technology & Infrastructure, DeFi & Protocols, AI & Agents, Governance & DAOs, Other).
+`score = (1 - normalized_entropy) × 100`, capped when Other dominates.
 
-**Behavior over popularity**
-Tessera measures behavioral signals rather than social metrics such as followers or engagement counts. The protocol evaluates how an account behaves over time rather than how popular it is.
+### Pillar 3 — Consistency (v1.0+)
+Measures whether you post regularly across the epoch or in bursts. Uses topic distribution entropy across thirds of the epoch (≥20 posts) or frequency variance (< 20 posts).
+
+### Pillar 4 — Depth (v1.0+)
+Measures engagement behavior — the ratio of replies and quote-posts to total active posts.
+`score = (replies + quotes) / active_posts × 100`
+
+### Pillar 5 — Signal Integrity (v1.1 TRACKING, scoring in v1.2+)
+Tracks CA (contract address) call accuracy — whether token calls made in posts prove accurate over a 7-day window. Data collection begins in v1.1. Scoring activates when sufficient historical call data exists. Displayed as **TRACKING** in the UI until scoring is live.
 
 ---
 
