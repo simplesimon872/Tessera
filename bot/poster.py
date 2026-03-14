@@ -51,11 +51,11 @@ def format_claim_already_claimed(handle, epoch, scores):
 
 def format_reveal(handle, snapshot, epoch, sealed):
     scores    = snapshot.get("scores", {})
-    ep        = snapshot.get("epoch", {})
     breakdown = snapshot.get("post_breakdown", {})
 
-    epoch_start = ep.get("start", "")[:10]
-    epoch_end   = ep.get("end", "")[:10]
+    # epoch dates live at top level of snapshot, not nested under "epoch"
+    epoch_start = snapshot.get("epoch_start", "")[:10]
+    epoch_end   = snapshot.get("epoch_end", "")[:10]
 
     composite   = _fmt(scores.get("composite"))
     originality = _fmt(scores.get("originality"))
@@ -69,7 +69,7 @@ def format_reveal(handle, snapshot, epoch, sealed):
     if sealed:
         seal_line = "Sealed onchain ✅"
     else:
-        days = _days_until_seal(ep.get("end", ""))
+        days = _days_until_seal()
         seal_line = f"Seals automatically in {days} day{'s' if days != 1 else ''} (Sunday midnight UTC)"
 
     return (
@@ -96,10 +96,9 @@ def format_reveal_insufficient(handle, total, active):
 
 def format_inspect_sealed(issuer, target, snapshot, anchor):
     scores = snapshot.get("scores", {})
-    ep     = snapshot.get("epoch", {})
 
-    epoch_start = ep.get("start", "")[:10]
-    epoch_end   = ep.get("end", "")[:10]
+    epoch_start = snapshot.get("epoch_start", "")[:10]
+    epoch_end   = snapshot.get("epoch_end", "")[:10]
 
     composite   = _fmt(scores.get("composite"))
     originality = _fmt(scores.get("originality"))
@@ -125,10 +124,9 @@ def format_inspect_sealed(issuer, target, snapshot, anchor):
 
 def format_inspect_unsealed(issuer, target, snapshot):
     scores = snapshot.get("scores", {})
-    ep     = snapshot.get("epoch", {})
 
-    epoch_start = ep.get("start", "")[:10]
-    epoch_end   = ep.get("end", "")[:10]
+    epoch_start = snapshot.get("epoch_start", "")[:10]
+    epoch_end   = snapshot.get("epoch_end", "")[:10]
 
     composite   = _fmt(scores.get("composite"))
     originality = _fmt(scores.get("originality"))

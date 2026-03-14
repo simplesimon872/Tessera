@@ -449,6 +449,10 @@ async def get_leaderboard(limit: int = 50):
                 seen[handle] = epoch
 
         # Build leaderboard entries
+        # Get all claimed handles in one query to flag claimed vs unclaimed
+        claimed_res = get_client().table("users").select("handle").execute()
+        claimed_handles = {row["handle"].lower() for row in (claimed_res.data or [])}
+
         leaderboard = []
         for handle, epoch in seen.items():
             scores_list = epoch.get("scores", [])
@@ -464,6 +468,7 @@ async def get_leaderboard(limit: int = 50):
                 "depth":       scores.get("depth"),
                 "epoch_end":   epoch.get("epoch_end"),
                 "status":      epoch.get("status"),
+                "claimed":     handle.lower() in claimed_handles,
             })
 
         # Sort by composite descending
