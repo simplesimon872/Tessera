@@ -33,7 +33,7 @@ export default async function LeaderboardPage() {
             <span className="font-mono text-xs text-muted">Claimed — sealing active</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="font-mono text-xs text-border">○</span>
+            <span className="font-mono text-xs text-muted">○</span>
             <span className="font-mono text-xs text-muted">Unclaimed — inspected only</span>
           </div>
         </div>
@@ -110,7 +110,7 @@ export default async function LeaderboardPage() {
                     </p>
                     {entry.claimed
                       ? <span className="font-mono text-xs text-accent shrink-0" title="Claimed">●</span>
-                      : <span className="font-mono text-xs text-border shrink-0" title="Not yet claimed">○</span>
+                      : <span className="font-mono text-xs text-muted shrink-0" title="Not yet claimed">○</span>
                     }
                   </div>
                   <p className="font-mono text-sm text-accent text-right">
