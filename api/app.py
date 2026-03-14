@@ -31,6 +31,7 @@ from pydantic import BaseModel
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from database.client import (
+    get_client,
     get_user, upsert_user, update_user_last_epoch,
     get_epoch, get_latest_epoch, create_epoch,
     update_epoch_status, get_epoch_history,
