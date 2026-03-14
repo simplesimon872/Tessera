@@ -31,7 +31,6 @@ from pydantic import BaseModel
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from database.client import (
-    get_client,
     get_user, upsert_user, update_user_last_epoch,
     get_epoch, get_latest_epoch, create_epoch,
     update_epoch_status, get_epoch_history,
@@ -56,7 +55,11 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://tessera.xyz", "http://localhost:3000"],
+    allow_origins=[
+        "https://tessera-8x7.pages.dev",
+        "https://tessera.xyz",
+        "http://localhost:3000",
+    ],
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
@@ -411,7 +414,7 @@ async def _run_scoring(handle: str, epoch_start: str, epoch_end: str) -> dict:
         epoch_start=epoch_start_dt,
         epoch_end=epoch_end_dt,
     )
-    snapshot = score_epoch(collection, classifier.classify)
+    snapshot = score_epoch(collection, classifier)
     return snapshot
 
 

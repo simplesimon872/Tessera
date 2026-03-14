@@ -107,7 +107,16 @@ def get_epochs_by_status(status: str) -> list[dict]:
 
 
 def create_epoch(handle: str, epoch_start: str, epoch_end: str) -> dict:
-    """Create a new epoch with status=computed. Return epoch row."""
+    """
+    Create or return an epoch row for (handle, epoch_start).
+    Returns existing row if one exists — prevents unique constraint
+    violations when force rescoring via reveal.
+    Status is never downgraded — a sealed epoch stays sealed.
+    """
+    existing = get_epoch(handle, epoch_start)
+    if existing:
+        logger.info(f"Epoch exists: @{handle} | {epoch_start[:10]} (status={existing['status']})")
+        return existing
     res = get_client().table("epochs").insert({
         "handle":      handle,
         "epoch_start": epoch_start,
@@ -144,24 +153,25 @@ def get_epoch_history(handle: str, limit: int = 10) -> list[dict]:
 def store_scores(epoch_id: str, snapshot: dict) -> dict:
     """
     Store pillar scores and full snapshot JSON for an epoch.
-    snapshot is the dict produced by scoring/engine.py.
+    Updates existing row if one exists (e.g. force rescore via reveal).
     """
     scores = snapshot.get("scores", {})
     breakdown = snapshot.get("post_breakdown", {})
     methodology = snapshot.get("methodology", {})
+    provenance = snapshot.get("provenance", {})
 
-    res = get_client().table("scores").insert({
+    payload = {
         "epoch_id":          epoch_id,
         "originality":       scores.get("originality"),
         "focus":             scores.get("focus"),
         "consistency":       scores.get("consistency"),
         "depth":             scores.get("depth"),
         "composite":         scores.get("composite"),
-        "methodology":       methodology.get("version", "v1.0"),
+        "methodology":       provenance.get("methodology_version") or methodology.get("version", "v1.0"),
         "snapshot_hash":     snapshot.get("snapshot_hash"),
-        "collection_hash":   methodology.get("collection_hash"),
-        "prompt_hash":       methodology.get("prompt_hash"),
-        "model":             methodology.get("model"),
+        "collection_hash":   provenance.get("collection_hash") or methodology.get("collection_hash"),
+        "prompt_hash":       provenance.get("prompt_hash") or methodology.get("prompt_hash"),
+        "model":             provenance.get("model") or methodology.get("model"),
         "consistency_mode":  scores.get("consistency_mode"),
         "other_cap_applied": scores.get("other_cap_applied", False),
         "post_total":        breakdown.get("total"),
@@ -169,8 +179,21 @@ def store_scores(epoch_id: str, snapshot: dict) -> dict:
         "post_greeting":     breakdown.get("greeting"),
         "post_null":         breakdown.get("null_track"),
         "snapshot_json":     snapshot,
-    }).execute()
-    logger.info(f"Scores stored: epoch {epoch_id[:8]}… | composite={scores.get('composite')}")
+    }
+
+    existing = get_scores(epoch_id)
+    if existing:
+        res = (
+            get_client().table("scores")
+            .update(payload)
+            .eq("epoch_id", epoch_id)
+            .execute()
+        )
+        logger.info(f"Scores updated: epoch {epoch_id[:8]}… | composite={scores.get('composite')}")
+    else:
+        res = get_client().table("scores").insert(payload).execute()
+        logger.info(f"Scores stored: epoch {epoch_id[:8]}… | composite={scores.get('composite')}")
+
     return res.data[0]
 
 

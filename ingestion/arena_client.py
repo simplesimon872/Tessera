@@ -130,10 +130,11 @@ class ArenaClient:
         """
         Fetch all posts by a user within the epoch window.
 
-        Paginates through feed/user and stops as soon as a post's
-        createdAt falls before epoch_start. Does not pull full history.
-
-        Returns a list of cleaned post dicts.
+        Confirmed from Arena API:
+        - Date field is createdDate (not createdAt)
+        - No pagination metadata returned — detect last page by thread count vs page_size
+        - Pinned posts appear at top of feed regardless of date — must be skipped
+          before applying the early-stop, otherwise they trigger a false stop
         """
         posts = []
         page = 1
@@ -148,52 +149,78 @@ class ArenaClient:
 
         while not done:
             data = self._get(
-                "/agents/threads/feed/user",
+                "/threads/feed/user",
                 params={"userId": user_id, "page": page, "pageSize": page_size}
             )
 
             threads = data.get("threads", [])
-
             if not threads:
                 break
 
             for thread in threads:
-                created = thread.get("createdAt", "")
+                created = thread.get("createdDate", "")
 
-                # Hit the boundary — everything older is outside the window
+                if not created:
+                    continue
+
+                # Pinned posts sit at top of feed regardless of date.
+                # Skip them before the early-stop check or they'll falsely
+                # terminate pagination for accounts with old pinned posts.
+                if thread.get("isPinned", False):
+                    continue
+
+                # Older than window — everything from here is too old
                 if created < epoch_start_str:
                     done = True
                     break
 
-                # Within the epoch window
-                if created <= epoch_end_str:
-                    posts.append(self._clean_post(thread))
+                if created > epoch_end_str:
+                    continue
 
-            # Check pagination
-            pagination = data.get("pagination", {})
-            if not pagination.get("hasNextPage", False):
+                posts.append(self._clean_post(thread))
+
+            if done:
+                break
+
+            # Arena returns no pagination metadata — detect last page by count
+            if len(threads) < page_size:
                 break
 
             page += 1
 
-        logger.info(f"Fetched {len(posts)} posts in epoch window")
+        logger.info(f"Fetched {len(posts)} posts in epoch window | pages={page}")
         return posts
 
     def _clean_post(self, thread: dict) -> dict:
         """
-        Extract and normalise only the fields we need.
-        Strips HTML from content before storage.
+        Extract and normalise fields from a thread dict.
+
+        threadType values:
+          "text" / "text_media" / "media" — original post
+          "quote"  — quote-repost: thread.content is user's own commentary
+          "repost" — pure repost: content is null (someone else's post)
+
+        Pure reposts have null content and are stored as empty string —
+        the scoring engine routes them to TRACK_NULL and excludes them
+        from all pillar calculations.
         """
+        thread_type = thread.get("threadType", "")
+        is_pure_repost = thread_type == "repost"
+        is_quote = thread_type == "quote"
+        raw_content = thread.get("content") or ""
+
         return {
-            "id": thread.get("id"),
-            "content": self._strip_html(thread.get("content", "")),
-            "content_raw": thread.get("content", ""),   # keep original too
-            "created_at": thread.get("createdAt"),
-            "user_id": thread.get("userId"),
-            "is_reply": thread.get("threadId") is not None,
-            "parent_thread_id": thread.get("threadId"),
-            "is_quote": thread.get("quotedThreadId") is not None,
-            "quoted_thread_id": thread.get("quotedThreadId"),
+            "id":               thread.get("id"),
+            "content":          self._strip_html(raw_content),
+            "content_raw":      raw_content,
+            "created_at":       thread.get("createdDate"),
+            "user_id":          thread.get("userId"),
+            "is_reply":         thread.get("answerId") is not None,
+            "parent_thread_id": thread.get("answerId"),
+            "is_quote":         is_quote,
+            "is_pure_repost":   is_pure_repost,
+            "quoted_thread_id": thread.get("repostId"),
+            "thread_type":      thread_type,
         }
 
     @staticmethod

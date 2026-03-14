@@ -120,7 +120,8 @@ def _get_or_score(handle: str, register: bool = True, force: bool = False) -> tu
 
     # Only register as claimed user if explicitly requested
     if register:
-        upsert_user(handle, snapshot.get("arena_user_id", "unknown"))
+        arena_user_id = snapshot.get("user_id") or snapshot.get("arena_user_id", "unknown")
+        upsert_user(handle, arena_user_id)
         update_user_last_epoch(handle, epoch["id"])
     else:
         logger.info(f"Scored @{handle} via inspect — saved to DB, not registered as claimed")
