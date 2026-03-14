@@ -61,6 +61,12 @@ export default function RootLayout({
             </a>
             <div className="flex items-center gap-6">
               <a
+                href="/how-it-works"
+                className="font-mono text-xs text-muted hover:text-primary transition-colors tracking-wider uppercase"
+              >
+                How It Works
+              </a>
+              <a
                 href="/leaderboard"
                 className="font-mono text-xs text-muted hover:text-primary transition-colors tracking-wider uppercase"
               >

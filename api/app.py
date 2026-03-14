@@ -266,8 +266,19 @@ async def trigger_seal(x_internal_secret: Optional[str] = Header(None)):
     Never called by users.
 
     Idempotent: already-sealed epochs are skipped.
+    After sealing, posts a notification to each sealed account on Arena.
+    On any failure, posts an admin alert to @simplesimon872 on Arena.
     """
     _require_internal(x_internal_secret)
+
+    # Initialise bot client for post-seal notifications
+    from bot.bannerus_client import BannerusClient
+    from bot.poster import format_seal_notification
+    bannerus_token = os.getenv("BANNERUS_API_KEY", "")
+    bot_client = BannerusClient(bearer_token=bannerus_token) if bannerus_token else None
+
+    ADMIN_HANDLE = "simplesimon872"
+    ADMIN_ARENA_ID = os.getenv("ADMIN_ARENA_ID", "")  # simplesimon872's Arena user ID
 
     computed_epochs = _get_computed_epochs_from_db()
     if not computed_epochs:
@@ -293,6 +304,7 @@ async def trigger_seal(x_internal_secret: Optional[str] = Header(None)):
         if not scores_row or not scores_row.get("snapshot_json"):
             logger.error(f"No snapshot found for epoch {epoch_id[:8]}…, skipping")
             failed += 1
+            failures.append({"handle": handle, "error": "no snapshot"})
             continue
 
         snapshot = scores_row["snapshot_json"]
@@ -303,11 +315,62 @@ async def trigger_seal(x_internal_secret: Optional[str] = Header(None)):
             update_epoch_status(epoch_id, "sealed")
             sealed += 1
             logger.info(f"Sealed: @{handle} | tx={result.receipt.tx_hash[:18]}…")
+
+            # ── Post seal notification to the user ────────────────────────
+            if bot_client:
+                try:
+                    user = get_user(handle)
+                    anchor_dict = {
+                        "tx_hash":       result.receipt.tx_hash,
+                        "block_number":  result.receipt.block_number,
+                        "anchored_at":   result.receipt.anchored_at,
+                        "snowtrace_url": result.receipt.snowtrace_url,
+                    }
+                    profile_url = f"https://tessera-8x7.pages.dev/{handle}"
+                    msg = (
+                        f"@{handle} — your Tessera epoch has been sealed onchain ✅\n\n"
+                        f"Epoch: {epoch.get('epoch_start','')[:10]} → {epoch.get('epoch_end','')[:10]}\n"
+                        f"Composite: {scores_row.get('composite', '—')}\n\n"
+                        f"TX: {result.receipt.tx_hash[:18]}…\n\n"
+                        f"Full record + banner: <a href=\"{profile_url}\">{profile_url}</a>"
+                    )
+                    bot_client.create_post(msg)
+                    logger.info(f"Seal notification posted: @{handle}")
+                except Exception as e:
+                    logger.error(f"Failed to post seal notification for @{handle}: {e}")
+
         else:
             update_epoch_status(epoch_id, "seal_failed")
             failed += 1
             failures.append({"handle": handle, "error": result.error})
-            logger.error(f"Seal failed: @{handle} | {result.error}")
+            logger.error(f"⚠️ SEAL FAILED: @{handle} | {result.error}")
+
+            # ── Post admin alert to @simplesimon872 ───────────────────────
+            if bot_client and ADMIN_ARENA_ID:
+                try:
+                    alert = (
+                        f"@{ADMIN_HANDLE} ⚠️ SEAL FAILED\n\n"
+                        f"Account: @{handle}\n"
+                        f"Epoch: {epoch_id[:8]}…\n"
+                        f"Error: {str(result.error)[:200]}"
+                    )
+                    bot_client.create_post(alert)
+                    logger.info(f"Admin alert posted for failed seal: @{handle}")
+                except Exception as e:
+                    logger.error(f"Failed to post admin alert: {e}")
+
+    # ── Post summary if any failures ──────────────────────────────────────
+    if failed > 0 and bot_client and ADMIN_ARENA_ID:
+        try:
+            summary = (
+                f"@{ADMIN_HANDLE} — cron seal complete\n\n"
+                f"✅ Sealed: {sealed}\n"
+                f"❌ Failed: {failed}\n\n"
+                f"Check Render logs for details."
+            )
+            bot_client.create_post(summary)
+        except Exception as e:
+            logger.error(f"Failed to post seal summary: {e}")
 
     # Update last seal run
     set_bot_state(
