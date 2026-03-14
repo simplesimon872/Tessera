@@ -75,6 +75,7 @@ export interface LeaderboardEntry {
   depth: number
   epoch_end: string
   status: string
+  claimed: boolean				  
 }
 
 export async function getProfile(handle: string): Promise<ProfileData | null> {
