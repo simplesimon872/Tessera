@@ -192,25 +192,17 @@ class BannerusClient:
             for thread in threads:
                 created = thread.get("createdDate", "")
 
-                # No date — skip but don't stop
                 if not created:
                     continue
 
-                # Pinned posts appear at the TOP of the feed regardless of date.
-                # A pinned post from months ago would incorrectly trigger the
-                # early-stop below. Skip pinned posts entirely — they are not
-                # representative of current epoch behavior anyway.
                 if thread.get("isPinned", False):
                     logger.debug(f"Skipping pinned post {thread.get('id', '')[:8]}… (date={created[:10]})")
                     continue
 
-                # Older than window — everything from here is too old, stop paging.
-                # Safe to use as stop signal now that pinned posts are filtered above.
                 if created < epoch_start_str:
                     done = True
                     break
 
-                # Newer than window — skip
                 if created > epoch_end_str:
                     continue
 
@@ -219,8 +211,11 @@ class BannerusClient:
             if done:
                 break
 
-            pagination = data.get("pagination", {})
-            if not pagination.get("hasNextPage", False):
+            # Arena's /threads/feed/user returns no pagination metadata (count is always 0).
+            # Detect last page by checking if we got fewer threads than requested.
+            # If we got a full page, there may be more.
+            if len(threads) < page_size:
+                logger.debug(f"Page {page}: got {len(threads)} < {page_size} — last page")
                 break
 
             page += 1
@@ -238,28 +233,37 @@ def _clean_post(thread: dict) -> dict:
     """
     Extract and normalise fields from a thread dict.
 
-    Handles reposts correctly:
-    - For reposts, thread.content is often empty
-    - Real content sits in thread.repost.content (the reposted thread object)
-    - We extract it so the classifier sees actual text, not an empty string
-    - is_quote flag is set so scoring engine knows it's a repost
-    """
-    content = thread.get("content", "") or ""
-    repost_obj = thread.get("repost")
-    is_repost = repost_obj is not None or thread.get("repostId") is not None
+    threadType values observed from Arena API:
+      "text"       — original post, content is the text
+      "text_media" — original post with image/video
+      "media"      — image/video post
+      "quote"      — quote-repost: thread.content is user's comment,
+                     thread.repost has the quoted post
+      "repost"     — pure repost: content is null, thread.repost has
+                     the original post (someone else's content)
 
-    # For reposts with empty main content, pull from nested repost object
-    if is_repost and repost_obj and not _strip_html(content).strip():
-        content = repost_obj.get("content", "") or ""
+    For pure reposts: we record the repost action (useful for depth
+    scoring) but set content to empty so the classifier doesn't score
+    someone else's words as this user's output.
+    """
+    thread_type = thread.get("threadType", "")
+    is_pure_repost = thread_type == "repost"
+    is_quote = thread_type == "quote" or (thread.get("repostId") is not None and thread_type != "repost")
+
+    # Pure reposts: content is null — use empty string so classifier skips it
+    # Quote reposts: content is the user's own commentary — use that
+    raw_content = thread.get("content") or ""
 
     return {
         "id":               thread.get("id"),
-        "content":          _strip_html(content),
-        "content_raw":      content,
+        "content":          _strip_html(raw_content),
+        "content_raw":      raw_content,
         "created_at":       thread.get("createdDate"),
         "user_id":          thread.get("userId"),
         "is_reply":         thread.get("answerId") is not None,
         "parent_thread_id": thread.get("answerId"),
-        "is_quote":         is_repost,
+        "is_quote":         is_quote,
+        "is_pure_repost":   is_pure_repost,
         "quoted_thread_id": thread.get("repostId"),
+        "thread_type":      thread_type,
     }
