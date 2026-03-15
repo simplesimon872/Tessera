@@ -1,0 +1,48 @@
+services:
+  # ── Tessera API (existing web service) ──────────────────────────────────────
+  - type: web
+    name: tessera-api
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api.app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ARENA_API_KEY
+        sync: false
+      - key: BANNERUS_API_KEY
+        sync: false
+      - key: INTERNAL_API_SECRET
+        sync: false
+      - key: ADMIN_ARENA_ID
+        sync: false
+      - key: PRIVATE_KEY
+        sync: false
+      - key: RPC_URL
+        sync: false
+      - key: CONTRACT_ADDRESS
+        sync: false
+
+  # ── Bannerus Bot (new background worker) ────────────────────────────────────
+  - type: worker
+    name: tessera-bot
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m bot.listener
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: BANNERUS_API_KEY
+        sync: false
+      - key: ADMIN_ARENA_ID
+        sync: false

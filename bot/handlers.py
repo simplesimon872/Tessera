@@ -67,7 +67,7 @@ def _run_scoring_sync(handle: str) -> Optional[dict]:
         epoch_end   = datetime.fromisoformat(epoch_end_str)
 
         client     = BannerusClient(bearer_token=os.getenv("BANNERUS_API_KEY", ""))
-        classifier = Classifier(api_key=os.getenv("ANTHROPIC_API_KEY", ""))
+        classifier = Classifier(api_key=os.getenv("ANTHROPIC_API_KEY", ""), log_raw=False)
 
         from scoring.engine import score_epoch
         collection = fetch_posts_for_epoch(
