@@ -190,12 +190,14 @@ class Classifier:
             content = post.get("content", "").replace("\n", " ").strip()
             numbered += f"{i + 1}. {content}\n"
 
+        # Simplified format — just a plain JSON array of category strings in order
+        # Avoids Claude adding extra fields or mismatching the n field
         batch_prompt = (
             f"{self.prompt}\n\n"
             f"Classify each of the following {len(batch)} posts.\n"
-            f"Return ONLY a JSON array with one object per post in order.\n"
-            f"Each object must have exactly: {{\"n\": <number>, \"category\": \"<label>\"}}\n"
-            f"No other text. No markdown. No explanation.\n\n"
+            f"Return ONLY a JSON array of {len(batch)} category strings in order.\n"
+            f"Example for 3 posts: [\"Market & Price\", \"Null\", \"Other\"]\n"
+            f"Each string must be exactly one of the allowed categories. No other text.\n\n"
             f"Posts:\n{numbered}"
         )
 
@@ -212,13 +214,13 @@ class Classifier:
                 parsed = self._parse_batch_response(raw, len(batch))
 
                 if parsed is not None:
-                    # Merge categories back into post dicts
                     result = []
                     for i, post in enumerate(batch):
                         result.append({
                             **post,
                             "category": parsed[i],
                         })
+                    logger.info(f"Batch of {len(batch)} classified in 1 API call")
                     return result
 
                 logger.warning(
@@ -243,6 +245,9 @@ class Classifier:
     def _parse_batch_response(self, raw: str, expected_count: int) -> list[str] | None:
         """
         Parse batch LLM response into a list of category strings.
+        Handles both formats:
+          - Simple array: ["Market & Price", "Null", ...]
+          - Object array: [{"category": "Market & Price"}, ...]
         Returns None if response is malformed.
         """
         cleaned = raw.strip()
@@ -263,23 +268,32 @@ class Classifier:
         if not isinstance(parsed, list):
             return None
 
-        if len(parsed) != expected_count:
-            logger.warning(
-                f"Batch response length mismatch: expected {expected_count}, "
-                f"got {len(parsed)}"
-            )
-            return None
-
+        # Handle both string arrays and object arrays
         categories = []
         for item in parsed:
-            if not isinstance(item, dict):
+            if isinstance(item, str):
+                cat = item.strip()
+            elif isinstance(item, dict):
+                cat = item.get("category", "Null")
+            else:
                 return None
-            cat = item.get("category")
+
             if cat not in ALLOWED_CATEGORIES_SET:
-                # Invalid category — substitute Null rather than failing entire batch
-                logger.warning(f"Unknown category in batch response: {cat!r} — using Null")
+                logger.warning(f"Unknown category in batch: {cat!r} — using Null")
                 cat = "Null"
             categories.append(cat)
+
+        # Tolerate minor count mismatches — pad with Null or trim
+        if len(categories) < expected_count:
+            logger.warning(
+                f"Batch short by {expected_count - len(categories)} — padding with Null"
+            )
+            categories.extend(["Null"] * (expected_count - len(categories)))
+        elif len(categories) > expected_count:
+            logger.warning(
+                f"Batch over by {len(categories) - expected_count} — trimming"
+            )
+            categories = categories[:expected_count]
 
         return categories
 
