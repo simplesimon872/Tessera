@@ -288,6 +288,9 @@ async def trigger_seal(x_internal_secret: Optional[str] = Header(None)):
     sealed = 0
     failed = 0
     failures = []
+    sealed_handles = []
+    sealed_tx = ""
+    sealed_snowtrace = ""
 
     for epoch in computed_epochs:
         epoch_id = epoch["id"]
@@ -314,30 +317,10 @@ async def trigger_seal(x_internal_secret: Optional[str] = Header(None)):
             store_anchor(epoch_id, result.receipt)
             update_epoch_status(epoch_id, "sealed")
             sealed += 1
+            sealed_handles.append(handle)
+            sealed_tx = result.receipt.tx_hash  # keep last TX for reference
+            sealed_snowtrace = result.receipt.snowtrace_url
             logger.info(f"Sealed: @{handle} | tx={result.receipt.tx_hash[:18]}…")
-
-            # ── Post seal notification to the user ────────────────────────
-            if bot_client:
-                try:
-                    user = get_user(handle)
-                    anchor_dict = {
-                        "tx_hash":       result.receipt.tx_hash,
-                        "block_number":  result.receipt.block_number,
-                        "anchored_at":   result.receipt.anchored_at,
-                        "snowtrace_url": result.receipt.snowtrace_url,
-                    }
-                    profile_url = f"https://tessera-8x7.pages.dev/{handle}"
-                    msg = (
-                        f"@{handle} — your Tessera epoch has been sealed onchain ✅\n\n"
-                        f"Epoch: {epoch.get('epoch_start','')[:10]} → {epoch.get('epoch_end','')[:10]}\n"
-                        f"Composite: {scores_row.get('composite', '—')}\n\n"
-                        f"TX: {result.receipt.tx_hash[:18]}…\n\n"
-                        f"Full record + banner: <a href=\"{profile_url}\">{profile_url}</a>"
-                    )
-                    bot_client.create_post(msg)
-                    logger.info(f"Seal notification posted: @{handle}")
-                except Exception as e:
-                    logger.error(f"Failed to post seal notification for @{handle}: {e}")
 
         else:
             update_epoch_status(epoch_id, "seal_failed")
@@ -362,7 +345,7 @@ async def trigger_seal(x_internal_secret: Optional[str] = Header(None)):
     # ── Post epoch sealed milestone announcement ──────────────────────────
     if sealed > 0 and bot_client:
         try:
-            # Get top 3 from leaderboard for the post
+            # Get top 3 from newly sealed epochs for the post
             top_res = (
                 get_client().table("epochs")
                 .select("handle, scores(*)")
@@ -392,17 +375,8 @@ async def trigger_seal(x_internal_secret: Optional[str] = Header(None)):
             for i, (h, score) in enumerate(sealed_entries[:3]):
                 top3_lines += f"{medals[i]} @{h} — {score:.1f}\n"
 
-            # Get a TX hash from this seal run for the verify link
-            sample_tx = ""
-            sample_snowtrace = ""
-            for epoch in computed_epochs:
-                anchor = get_anchor(epoch["id"])
-                if anchor and anchor.get("tx_hash"):
-                    sample_tx = anchor["tx_hash"][:18] + "…"
-                    sample_snowtrace = anchor.get("snowtrace_url", "")
-                    break
-
-            BOT_ADDRESS = "0xA84f3836149513c84ba91394F92b9449Ce5b9Cab"
+            # Tag all sealed accounts in the post
+            sealed_tags = " ".join(f"@{h}" for h in sealed_handles)
 
             announcement = (
                 f"Tessera Epoch 1 just sealed on Avalanche C-Chain mainnet. ✅\n\n"
@@ -411,16 +385,40 @@ async def trigger_seal(x_internal_secret: Optional[str] = Header(None)):
                 f"Originality, focus, consistency, depth. Scored deterministically. Sealed onchain. No edits. No deletions. Ever.\n\n"
                 f"Top 3 this epoch:\n"
                 f"{top3_lines}\n"
+                f"Sealed this epoch: {sealed_tags}\n\n"
                 f"Think your score could be higher? The next epoch is already running.\n\n"
                 f"Reply to this post with:\n"
                 f"• \"reveal\" to see your score\n"
                 f"• \"claim\" to activate your record and start sealing\n"
                 f"• \"inspect @handle\" to score anyone on Arena\n\n"
-                f"Verify the seal: {sample_snowtrace}\n"
+                f"Verify the seal: {sealed_snowtrace}\n"
                 f"Full leaderboard: https://tessera-8x7.pages.dev/leaderboard"
             )
             bot_client.create_post(announcement)
             logger.info(f"Epoch sealed milestone post published")
+
+            # ── Post to unclaimed accounts ─────────────────────────────────
+            try:
+                # Get all handles that have scores but never claimed
+                all_epoch_handles = {row["handle"] for row in (top_res.data or [])}
+                claimed_res = get_client().table("users").select("handle").execute()
+                claimed_set = {row["handle"].lower() for row in (claimed_res.data or [])}
+                unclaimed = [h for h in all_epoch_handles if h.lower() not in claimed_set]
+
+                if unclaimed:
+                    tags = " ".join(f"@{h}" for h in unclaimed)
+                    unclaimed_post = (
+                        f"{tags}\n\n"
+                        f"Your Tessera score was tracked this epoch but your record wasn't sealed — "
+                        f"you need to claim first to start sealing onchain.\n\n"
+                        f"The good news: the next epoch is already running and your score is being tracked.\n\n"
+                        f"Reply to this post with \"claim\" to activate your record. One post. That's it.\n\n"
+                        f"tessera-8x7.pages.dev/leaderboard"
+                    )
+                    bot_client.create_post(unclaimed_post)
+                    logger.info(f"Unclaimed notification posted to {len(unclaimed)} accounts")
+            except Exception as e:
+                logger.error(f"Failed to post unclaimed notification: {e}", exc_info=True)
         except Exception as e:
             logger.error(f"Failed to post milestone announcement: {e}", exc_info=True)
 
