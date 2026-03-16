@@ -47,6 +47,56 @@ RATE_LIMIT_PER_USER  = 5        # max commands per user per hour
 GLOBAL_CAP_PER_MIN   = 30       # max commands across all users per minute
 RATE_LIMIT_EXEMPT    = {"simplesimon872"}  # handles exempt from rate limiting
 
+# ── Seal schedule ─────────────────────────────────────────────────────────────
+# Sunday midnight UTC. Bot checks every poll cycle and triggers the seal
+# endpoint once per week using a DB flag to prevent double-firing.
+SEAL_DAY_UTC         = 6        # Sunday (Monday=0 ... Sunday=6)
+SEAL_HOUR_UTC        = 0        # midnight UTC
+SEAL_STATE_KEY       = "last_seal_run_by_bot"  # stored in bot_state table
+
+
+def _maybe_run_seal(get_state_fn, set_state_fn):
+    """
+    Check if it's Sunday midnight UTC and the seal hasn't run yet this week.
+    If so, call the cron seal endpoint directly.
+    Idempotent: stores the date it last ran in bot_state so it never fires twice.
+    """
+    now = datetime.now(timezone.utc)
+
+    # Only fire on Sunday (weekday=6) during the midnight hour (0–1am UTC)
+    if now.weekday() != SEAL_DAY_UTC or now.hour != SEAL_HOUR_UTC:
+        return
+
+    # Check if we already ran the seal today
+    today_str = now.strftime("%Y-%m-%d")
+    last_ran = get_state_fn(SEAL_STATE_KEY)
+    if last_ran == today_str:
+        return  # already fired today
+
+    logger.info(f"🔒 Sunday midnight UTC — triggering weekly epoch seal…")
+
+    try:
+        import requests as _requests
+        internal_secret = os.getenv("INTERNAL_API_SECRET", "")
+        api_url = os.getenv("INTERNAL_API_URL", "http://localhost:8000")
+        resp = _requests.post(
+            f"{api_url}/api/cron/seal",
+            headers={"x-internal-secret": internal_secret},
+            timeout=300,  # seal can take a while with many accounts
+        )
+        if resp.ok:
+            data = resp.json().get("data", {})
+            sealed  = data.get("sealed", 0)
+            failed  = data.get("failed", 0)
+            logger.info(f"✅ Seal complete — sealed={sealed} failed={failed}")
+        else:
+            logger.error(f"❌ Seal endpoint returned {resp.status_code}: {resp.text[:200]}")
+    except Exception as e:
+        logger.error(f"❌ Seal trigger failed: {e}", exc_info=True)
+
+    # Mark as done for today regardless of outcome — prevents retry loops
+    set_state_fn(SEAL_STATE_KEY, today_str)
+
 
 def run():
     """Main entry point. Runs forever."""
@@ -100,6 +150,9 @@ def run():
                 logger.error(
                     f"Polling loop silent for >{SILENCE_ALERT_S}s — check connectivity"
                 )
+
+            # ── Weekly seal check ─────────────────────────────────────────────
+            _maybe_run_seal(get_bot_state, set_bot_state)
 
             # ── Fetch notifications ───────────────────────────────────────────
             logger.info("Polling /agents/notifications…")

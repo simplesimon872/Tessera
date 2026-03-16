@@ -359,7 +359,72 @@ async def trigger_seal(x_internal_secret: Optional[str] = Header(None)):
                 except Exception as e:
                     logger.error(f"Failed to post admin alert: {e}")
 
-    # ── Post summary if any failures ──────────────────────────────────────
+    # ── Post epoch sealed milestone announcement ──────────────────────────
+    if sealed > 0 and bot_client:
+        try:
+            # Get top 3 from leaderboard for the post
+            top_res = (
+                get_client().table("epochs")
+                .select("handle, scores(*)")
+                .eq("status", "sealed")
+                .order("epoch_start", desc=True)
+                .limit(50)
+                .execute()
+            )
+            # Build sorted leaderboard from sealed epochs
+            sealed_entries = []
+            seen_handles = set()
+            for row in (top_res.data or []):
+                h = row["handle"]
+                if h in seen_handles:
+                    continue
+                seen_handles.add(h)
+                scores_list = row.get("scores", [])
+                scores = scores_list[0] if isinstance(scores_list, list) and scores_list else {}
+                composite = scores.get("composite")
+                if composite is not None:
+                    sealed_entries.append((h, composite))
+            sealed_entries.sort(key=lambda x: x[1], reverse=True)
+
+            # Build top 3 lines
+            medals = ["🥇", "🥈", "🥉"]
+            top3_lines = ""
+            for i, (h, score) in enumerate(sealed_entries[:3]):
+                top3_lines += f"{medals[i]} @{h} — {score:.1f}\n"
+
+            # Get a TX hash from this seal run for the verify link
+            sample_tx = ""
+            sample_snowtrace = ""
+            for epoch in computed_epochs:
+                anchor = get_anchor(epoch["id"])
+                if anchor and anchor.get("tx_hash"):
+                    sample_tx = anchor["tx_hash"][:18] + "…"
+                    sample_snowtrace = anchor.get("snowtrace_url", "")
+                    break
+
+            BOT_ADDRESS = "0xA84f3836149513c84ba91394F92b9449Ce5b9Cab"
+
+            announcement = (
+                f"Tessera Epoch 1 just sealed on Avalanche C-Chain mainnet. ✅\n\n"
+                f"{sealed} Arena accounts. {sealed} behavioral records. One TX hash. Permanent. Verifiable by anyone.\n\n"
+                f"This is what manipulation-resistant social reputation looks like — not followers, not likes. "
+                f"Originality, focus, consistency, depth. Scored deterministically. Sealed onchain. No edits. No deletions. Ever.\n\n"
+                f"Top 3 this epoch:\n"
+                f"{top3_lines}\n"
+                f"Think your score could be higher? The next epoch is already running.\n\n"
+                f"Reply to this post with:\n"
+                f"• \"reveal\" to see your score\n"
+                f"• \"claim\" to activate your record and start sealing\n"
+                f"• \"inspect @handle\" to score anyone on Arena\n\n"
+                f"Verify the seal: {sample_snowtrace}\n"
+                f"Full leaderboard: https://tessera-8x7.pages.dev/leaderboard"
+            )
+            bot_client.create_post(announcement)
+            logger.info(f"Epoch sealed milestone post published")
+        except Exception as e:
+            logger.error(f"Failed to post milestone announcement: {e}", exc_info=True)
+
+    # ── Post summary to admin if any failures ─────────────────────────────
     if failed > 0 and bot_client and ADMIN_ARENA_ID:
         try:
             summary = (
