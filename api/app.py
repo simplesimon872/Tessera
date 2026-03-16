@@ -273,7 +273,6 @@ async def trigger_seal(x_internal_secret: Optional[str] = Header(None)):
 
     # Initialise bot client for post-seal notifications
     from bot.bannerus_client import BannerusClient
-    from bot.poster import format_seal_notification
     bannerus_token = os.getenv("BANNERUS_API_KEY", "")
     bot_client = BannerusClient(bearer_token=bannerus_token) if bannerus_token else None
 
@@ -399,11 +398,15 @@ async def trigger_seal(x_internal_secret: Optional[str] = Header(None)):
 
             # ── Post to unclaimed accounts ─────────────────────────────────
             try:
-                # Get all handles that have scores but never claimed
+                # Unclaimed = has epochs in DB but never ran claim
+                # Exclude handles we just sealed (they're claimed)
                 all_epoch_handles = {row["handle"] for row in (top_res.data or [])}
                 claimed_res = get_client().table("users").select("handle").execute()
                 claimed_set = {row["handle"].lower() for row in (claimed_res.data or [])}
-                unclaimed = [h for h in all_epoch_handles if h.lower() not in claimed_set]
+                unclaimed = [
+                    h for h in all_epoch_handles
+                    if h.lower() not in claimed_set
+                ]
 
                 if unclaimed:
                     tags = " ".join(f"@{h}" for h in unclaimed)
@@ -449,10 +452,23 @@ async def trigger_seal(x_internal_secret: Optional[str] = Header(None)):
 
 
 def _get_computed_epochs_from_db() -> list[dict]:
-    """Get all epochs with status=computed OR seal_failed (retry)."""
+    """
+    Get epochs ready to seal — only for claimed accounts.
+    Unclaimed accounts are scored but not sealed until they claim.
+    """
     computed = get_epochs_by_status("computed")
     failed   = get_epochs_by_status("seal_failed")
-    return computed + failed
+    all_epochs = computed + failed
+
+    # Filter to claimed accounts only
+    claimed_res = get_client().table("users").select("handle").execute()
+    claimed_handles = {row["handle"].lower() for row in (claimed_res.data or [])}
+
+    filtered = [e for e in all_epochs if e["handle"].lower() in claimed_handles]
+    skipped  = len(all_epochs) - len(filtered)
+    if skipped:
+        logger.info(f"Skipping {skipped} unclaimed account epochs — claim first to seal")
+    return filtered
 
 
 # ── POST /api/bot/command ─────────────────────────────────────────────────────

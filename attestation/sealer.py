@@ -185,12 +185,13 @@ def anchor_epoch(snapshot: dict) -> AnchorReceipt:
     return anchor_receipt
 
 
-def _wait_for_receipt(w3: Web3, tx_hash_bytes: bytes, handle: str, timeout: int = 120) -> dict:
+def _wait_for_receipt(w3: Web3, tx_hash_bytes: bytes, handle: str, timeout: int = 300) -> dict:
     """
     Poll for transaction receipt until confirmed or timeout.
 
-    Avalanche C-Chain typically confirms in ~2 seconds.
-    Timeout of 120s is generous — alert if we ever hit it.
+    Avalanche C-Chain typically confirms in ~2 seconds but RPC nodes
+    can lag. 300s timeout is generous enough to handle slow RPC responses
+    without resubmitting valid transactions.
     """
     start = time.time()
     poll_interval = 2  # seconds
